@@ -14,12 +14,11 @@
 ############################################################################# 
 
 use DateTime;
-use Data::Dumper;
 use strict;use warnings;
 my $local_time_zone = DateTime::TimeZone->new( name => 'local' );
-my $VERSION=0.01;
+my $VERSION=0.02;
 
-our %colours=(black   =>30,red   =>31,green   =>32,yellow   =>33,blue   =>34,magenta   =>35,cyan  =>36,white   =>37,
+my %colours=(black   =>30,red   =>31,green   =>32,yellow   =>33,blue   =>34,magenta   =>35,cyan  =>36,white   =>37,
                on_black=>40,on_red=>41,on_green=>42,on_yellow=>43,on_blue=>44,on_magenta=>4,on_cyan=>46,on_white=>47,
                reset=>0, bold=>1, italic=>3, underline=>4, blink=>5, strikethrough=>9, invert=>7,);
 
@@ -38,9 +37,20 @@ exit;
 }
 
 my ($yearStart,$yearEnd, @misc)=@ARGV;
-$yearStart=2024;
-our $today=  DateTime->now;
 my $dt = DateTime->now;
+my $today=  sprintf("%04d", $dt->year).sprintf("%02d", $dt->month).sprintf("%02d", $dt->day);
+$yearStart//=$dt->year;
+
+my $cdv=[  # test cdv to try out formatting dates
+           {name=>"test event",datestart=>"20240614",format=>"red"},
+           {name=>"test event",datestart=>"20240117",format=>"green"},
+           {name=>"test event",datestart=>"20240128",format=>"red"},
+           {name=>"test event",datestart=>"20240323",format=>"green"},
+           {name=>"test event",datestart=>"20240523",format=>"red"},
+        ];
+
+
+
 if ($yearStart && $yearStart<=12){
 	if ($yearEnd){
 	    $dt= DateTime->new(year=>$yearEnd,month=>$yearStart);
@@ -55,7 +65,7 @@ elsif ($yearStart){
 	$yearEnd//=$yearStart;
 	while ($yearStart<=$yearEnd){
 	   print @{center($yearStart,35)},"\n";
-	   print drawGrid(yearGrid($yearStart,{showWeek=>1,showYear=>0}));
+	   print drawGrid(yearGrid($yearStart,{showWeek=>0,showYear=>0}));
 	   $yearStart++;
 	}
 }
@@ -88,8 +98,9 @@ sub monthGrid{
 	   my @r=();
 	   push @r,(length $weekNo<2?" ":"").$weekNo++."|" if $options->{showWeek}; # pad out weekNo
 	   foreach(0..6){
-		   my $md=shift @mDays//"";                 # each date for the week
-		   my $ptMd=($today->day eq $md && $today->month eq $date->month && $today->year eq $date->year)?paint($md,"invert"):$md;
+		   my $md=shift @mDays//" ";                 # each date for the week
+		   #my $ptMd=($md eq " ")?$md:paintMd(DateTime->new(day=>$md, month=>$date->month , year=>$date->year),undef,undef);
+		   my $ptMd=paintMd($date->year,$date->month,$md);
 		   push @r," " x (3-length $md).$ptMd;          # padded out
 	   }
 	   push @$cal,[@r] unless ((($r[0] eq "   ")&& ($r[6] eq "   "))||($options->{showWeek} && ($r[1] eq "   ") && ($r[7] eq "   ")))
@@ -121,6 +132,7 @@ sub yearGrid{
 	return $grid;
 }
 
+
 sub center{  # a 3 character positioned in middle of other 3 character blocks
 	my ($text,$width)=@_;
 	$text=substr $text,0,3*$width;         # truncate if bigger than the space allocated
@@ -147,6 +159,25 @@ sub insertBlock{
 			  $grid->[$yPos+$y]->[$xPos+$x]=$block->[$y]->[$x];
 		}
 	}
+}
+
+sub paintMd{  # colours dates according to template
+	my ($y,$m,$d)=@_;
+	return " " if ($d eq " ");
+	my $dstr= sprintf("%04d", $y).sprintf("%02d", $m).sprintf("%02d", $d);
+	return paint($d,"invert") if  ($dstr eq $today);
+	return $d unless $cdv;
+	foreach my $event (@$cdv){
+			if($dstr eq $event->{datestart}){
+				return paint($d, $event->{format})
+			}
+		}
+	return $d;
+}
+
+sub dateMatch{  # check match date 
+	my ($dt1,$dt2)=@_;
+	return ($dt1->day == $dt2->day && $dt1->month == $dt2->month && $dt1->year == $dt2->year);
 }
 
 sub paint{
