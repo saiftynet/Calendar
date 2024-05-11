@@ -1,27 +1,27 @@
 #!/usr/bin/env perl
 
-####    Pure Perl implementation of a terminal calendar app       ###
-#                                                                   #
-#  * by default produce a monthly calendar for current month        #
-#  * if passed a number less than 12 produces a calendar for        #
-#    that month in current year                                     #
-#  * if passed two numbers and first is less than 12 then prints    #
-#    corresponding month in that year                               #
-#  * if passed number greater than 12 prints the calendar for       #
-#    the year in a grid form                                        #
-#                                                                   #
-#####################################################################  
+####       Pure Perl implementation of a terminal calendar app            ###
+#                                                                           #
+#  * by default produce a monthly calendar for current month                #
+#  * if passed a number less than 12 produces a calendar for                #
+#    that month in current year                                             #
+#  * if passed two numbers and first is less than 12 then prints            #
+#    corresponding month in that year                                       #
+#  * if passed number greater than 12 prints the calendar for               #
+#    the year in a grid form                                                #
+#  * https://gist.github.com/viviparous/efa21bd6374824ba8332a3a4ac7b4585    #                                                                #
+#                                                                           #
+############################################################################# 
 
 use DateTime;
 use Data::Dumper;
 use strict;use warnings;
 my $local_time_zone = DateTime::TimeZone->new( name => 'local' );
-
+my $VERSION=0.01;
 
 our %colours=(black   =>30,red   =>31,green   =>32,yellow   =>33,blue   =>34,magenta   =>35,cyan  =>36,white   =>37,
                on_black=>40,on_red=>41,on_green=>42,on_yellow=>43,on_blue=>44,on_magenta=>4,on_cyan=>46,on_white=>47,
                reset=>0, bold=>1, italic=>3, underline=>4, blink=>5, strikethrough=>9, invert=>7,);
-
 
 # usage
 if ($ARGV[0]  && $ARGV[0] eq "-h"){
@@ -54,12 +54,13 @@ if ($yearStart && $yearStart<=12){
 elsif ($yearStart){
 	$yearEnd//=$yearStart;
 	while ($yearStart<=$yearEnd){
+	   print @{center($yearStart,35)},"\n";
 	   print drawGrid(yearGrid($yearStart,{showWeek=>1,showYear=>0}));
 	   $yearStart++;
 	}
 }
 else{
-	print drawGrid(monthGrid($dt));
+	print drawGrid(monthGrid($dt,{showWeek=>0,showYear=>1}));
 }
 
 sub drawGrid{
@@ -75,8 +76,9 @@ sub monthGrid{
    my ($date,$options)=@_;
    $options->{showYear}//=1;
    $options->{showWeek}//=1;
-   my $cal=[center($date->month_name. ($options->{showYear}?"  ".$date->year:""),21+3*$options->{showWeek})]; # Title
-   push @$cal,[($options->{showWeek}?" w|":"")," Mo"," Tu"," We"," Th"," Fr"," Sa"," Su"];          # Header row
+   my $cal=[center($date->month_name. ($options->{showYear}?"  ".$date->year:""),7+($options->{showWeek}?1:0))]; # Title
+      
+   push @$cal,[($options->{showWeek}?(" w|"):())," Mo"," Tu"," We"," Th"," Fr"," Sa"," Su"];          # Header row
    my $firstDay=DateTime->new(year=>$date->year,month=>$date->month);       # date of first day of month
    my $weekNo=int(($firstDay->doy+6)/7);        # week number for first day of month
    my @mDays=((" ") x ($firstDay->day_of_week-1), (1..$date->month_length));# list of days
@@ -99,36 +101,40 @@ sub monthGrid{
 sub yearGrid{
 	my ($year, $options)=@_;
 	$options->{monthsPerRow}//=4;
-	$options->{hPadding}//=2;
-	$options->{vPadding}//=1;
+	$options->{hPadding}//=4;
+	$options->{vPadding}//=0;
 	my $rows=int 12/$options->{monthsPerRow};
-	my $grid=textGrid($options->{monthsPerRow}*(7 + ($options->{showWeek}?1:0)+ $options->{hPadding})-1,$rows*(8+$options->{vPadding})-$options->{vPadding});
+	my $grid=textGrid($options->{monthsPerRow}*(7 + ($options->{showWeek}?1:0))-1,$rows*(8+$options->{vPadding})-$options->{vPadding}-1);
 	my $ypos=0; my $month=1;
 	foreach(0..$rows-1){
 		my $ypos=$_*(8+$options->{vPadding});
 		foreach my $col(0..$options->{monthsPerRow}-1){
 			my $mg=monthGrid(DateTime->new(year=>$year,month=>$month),$options);
-			 insertBlock($grid,$mg,$col*(7 + ($options->{showWeek}?1:0)+$options->{hPadding}),$ypos);
+			 insertBlock($grid,$mg,$col*(9 + ($options->{showWeek}?1:0)),$ypos);
 			 $month++;
 		}
+		foreach my $col(1..$options->{monthsPerRow}-1){ #put n the padding
+			 insertBlock($grid,[([" " x $options->{hPadding}])x8],[undef,7,17,27,37]->[$col] + ($options->{showWeek}?1:0),$ypos);
+		 }
 	}
 	
 	return $grid;
 }
 
-sub center{
+sub center{  # a 3 character positioned in middle of other 3 character blocks
 	my ($text,$width)=@_;
-	if (length $text<$width){
-		return [split(//,(" " x (($width-length $text)/2)).$text.(" " x (($width-length $text)/2)).((length $text)%2?" ":""))];
-	}
-	return   [split(//,substr ($text,0,$width))];
+	$text=substr $text,0,3*$width;         # truncate if bigger than the space allocated
+	my @split=$text=~/(.{1,3})/g;          # split into 3 character blocks
+	$split[-1].=" "x(3-length $split[-1]); # pad out last block in neded
+	my $pre=int(($width-scalar @split)/2 + 0.5);my $post=$width-$pre-scalar @split;
+	return [("   ")x$pre, @split,("   ")x$post];
 }
 
 sub textGrid {
      my ($width,$height)=@_;
      my @grid;
      foreach (0..$height){
-		 $grid[$_]=[(" ")x$width];
+		 $grid[$_]=[("")x$width];
 	 }
 	return [@grid];
 }
@@ -138,15 +144,9 @@ sub insertBlock{
 	my $blockWidth=length $block->[0];
 	foreach my $y (0..$#$block){
 		foreach my $x (0..$#{$block->[$y]}){
-			if ($y==0){
-				 $grid->[$yPos+$y]->[3*$xPos+$x]=$block->[$y]->[$x];
-			}
-			else{
-				   $grid->[$yPos+$y]->[$xPos+$x]=$block->[$y]->[$x];
-			}
+			  $grid->[$yPos+$y]->[$xPos+$x]=$block->[$y]->[$x];
 		}
 	}
-	
 }
 
 sub paint{
