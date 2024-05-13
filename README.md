@@ -3,11 +3,20 @@
 Objective create a general purpose calendar application in pure perl for the terminal
 
 * Minimal dependencies
-* Customisable (yearview, month view, show week number)
-* Highlightable (TODO)
+* Customisable (yearview, month view, show week number done in Version 0.01)
+* Highlightable (done in Version 0.03)
 * Import ICS files and appropriate highlighting (TODO)
 * Interactive calendar  (TODO)
 * Create iCAL files
+ 
+### Version 0.03
+
+The application has been renamed "paella".
+
+* Dependency on DateTime removed (no extrernal modules required: this will be a monolithic, single file application)
+* Decorations added, including borders
+* Colours, blinking, underlining etc
+* Calendars can be placed anywhere in the terminal window. (May eventually become a Term::Graille Widget)
   
 
 ### Version 0.01
