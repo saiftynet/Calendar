@@ -17,6 +17,10 @@ The application has been renamed "paella".
 * Decorations added, including borders
 * Colours, blinking, underlining etc
 * Calendars can be placed anywhere in the terminal window. (May eventually become a Term::Graille Widget)
+
+
+  ![image](https://github.com/saiftynet/Calendar/assets/34284663/c00a2841-755a-44e8-a896-24cbfaec07b5)
+
   
 
 ### Version 0.01
