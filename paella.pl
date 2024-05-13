@@ -1,16 +1,7 @@
 #!/usr/bin/env perl
 
-####       Pure Perl implementation of a terminal calendar app            ###
-#                                                                           #
-#  * by default produce a monthly calendar for current month                #
-#  * if passed a number less than 12 produces a calendar for                #
-#    that month in current year                                             #
-#  * if passed two numbers and first is less than 12 then prints            #
-#    corresponding month in that year                                       #
-#  * if passed number greater than 12 prints the calendar for               #
-#    the year in a grid form                                                #
-#  * https://gist.github.com/viviparous/efa21bd6374824ba8332a3a4ac7b4585    #                                                                #
-#                                                                           #
+############################################################################# 
+####        Paella:   A Calendar Application for the Terminal             ###
 ############################################################################# 
 
 use strict; use warnings;
@@ -62,6 +53,15 @@ sub valDate{
 	return "Invalid date : $_[0];  date too big for month" unless ((($m.$d eq "0229") && ly($y.$m.$d)) || ($dm[$m-1]>=$d) );
 	return "Valid";
 }
+my $cdv=[];
+foreach (0..50){
+	$cdv=[@$cdv,
+	   {  name     =>"test event",
+          datestart=>"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28)),
+          format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}
+       ]
+}
+
 
 
 # terminal colouring and printing and clearing: 
@@ -146,10 +146,17 @@ sub paintMd{
 	my ($date,$dt,$options)=@_;
 	#return unless $date;
 	my $painted=$date;
+	my @decorations=();
 	if ($date ne " "){
-	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){$painted=paint($date,"bold red ");};
+	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){push @decorations,"invert";};
+		foreach my $event (@$cdv){
+				if(substr ($dt,0,6).sprintf("%02d",$date) eq $event->{datestart}){
+					push @decorations,$event->{format};
+				}
+		}
+		$painted=paint($date,join(" ",@decorations));
 	}
-	
+
 	return " "x(3-length $date).$painted;#paint($date,$dt,$options);
 	
 }
