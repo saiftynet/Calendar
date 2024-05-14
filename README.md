@@ -21,7 +21,7 @@ Objective create a general purpose calendar application in pure perl for the ter
  
 ### Version 0.03
 
-The application has been renamed "paella".
+The application has been renamed `paella`.
 
 * Dependency on DateTime removed (no extrernal modules required: this will be a monolithic, single file application)
 * Decorations added, including borders
