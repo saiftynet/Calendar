@@ -8,6 +8,16 @@ Objective create a general purpose calendar application in pure perl for the ter
 * Import ICS files and appropriate highlighting (TODO)
 * Interactive calendar  (TODO)
 * Create iCAL files
+
+### Version 0.04
+
+`paella` now has interactivity, allowing navigation through days/month years.
+
+* Key detection and action (arrow keys = change days,page up/page down=change months, tab/shift tab = change years
+* Simple Calendar arithmetic
+* Blinking of current focus of date
+* Inverted is todays date
+* Randomly generated (for now) date heighlighting;
  
 ### Version 0.03
 
