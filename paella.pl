@@ -5,7 +5,8 @@
 ############################################################################# 
 
 use strict; use warnings;
-my $VERSION=0.03;
+my $VERSION=0.04;
+
 
 # set of functions work on Dates in the form of a YYYYMMDD string
 # These could be easily replaced with more robust DateTime  or
@@ -13,6 +14,8 @@ my $VERSION=0.03;
 # limits needless conversions to a minimum.
 
 my $today=today();
+my $current=$today;
+# die $current;
 # accummulated days of year
 my @acc=(0,31,59,90,120,151,181,212,243,273,304,334);
 # Names of days of week
@@ -23,14 +26,16 @@ my @mn=qw/January February March April May June July August September October No
 my @dm=(31,28,31,30,31,30,31,31,30,31,30,31);
 #today's date in string form;
 sub today{my (undef,undef,undef,$mday,$mon,$year) = localtime;return (1900+$year).sprintf("%02d",$mon+1).sprintf("%02d",$mday)};
-# split 8 char date
+# split 8 char date into ymb
 sub spDt{ return ($_[0]=~/(\d{4})(\d{2})(\d{2})/)};
+#join ymd numbers into string
+sub jDt{ return sprintf ("%04d",$_[0]).sprintf ("%02d",$_[1]).sprintf ("%02d",$_[2])};
 # test leap year                           
 sub ly{my ($y,$m,$d)=spDt($_[0]);return (($y%4) - ($y%100) + ($y%400))?0:1;};
 # day 1 of year Gregorian
 sub d1greg{my ($y,$m,$d)=spDt($_[0]);return 1+(5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
 # day of year
-sub doy{my ($y,$m,$d)=spDt($_[0]);return $d+$acc[$m-1]+((ly($y.$m.$d)&&($m>2))?1:0);}
+sub doy{my ($y,$m,$d)=spDt($_[0]);;return $d+$acc[$m-1]+((ly(jDt($y,$m,$d))&&($m>2))?1:0);}
 # week of year
 sub woy{return int((doy($_[0])+6)/7);}
 # day of date
@@ -38,9 +43,25 @@ sub day{my ($doy,$d1y)=(doy($_[0]),d1greg($_[0]));return 1+($doy-$d1y)%7;};
 # 1st day of month
 sub d1m{my ($y,$m,$d)=spDt($_[0]);return day($y.$m."01")};
 # days in month
-sub dim{my ($y,$m,$d)=spDt($_[0]);return $dm[$m-1]; }
+sub dim{my ($y,$m,$d)=spDt($_[0]);return (($m==2)&&ly($y."0101"))?29:$dm[$m-1]; }
 # named day
 sub dn{return $wdn[day($_[0])-1]};
+# add Day(s) to date;
+sub addDay{my ($y,$m,$d)=spDt($_[0]);my $dte=$d+($_[1]//1);
+	       while ($dte>dim(jDt($y,$m,$d))){$dte-=(dim(jDt($y,$m,$d)));$m++;$d=1;
+		   if ($m>12){$y++;$m=1}};
+		   return jDt($y,$m,$dte);}
+# take away Day(s) from date;
+sub subDay{my ($y,$m,$d)=spDt($_[0]);my $dte=$d-($_[1]//1);
+	       while ($dte<1){$m--;$dte+=dim(jDt($y,$m,$d));
+		   if ($m<1){$y--;$m=12}};
+		   return jDt($y,$m,$dte);}
+# next months(s) to date;
+sub addMonth{my ($y,$m,$d)=spDt($_[0]);$m+=($_[1]//1);
+		   while ($m>12){$y++;$m-=12};return jDt($y,$m,1);}
+# previousmonths(s) from date;
+sub subMonth{my ($y,$m,$d)=spDt($_[0]);$m-=($_[1]//1);;
+		   while ($m<1){$y--;$m+=12};  return jDt($y,$m,1);}
 # convert to dd/mm/yyyy format
 sub dmy{ join("/",reverse (spDt($_[0])))};
 # convert to mm/dd/yyyy format
@@ -64,7 +85,7 @@ foreach (0..50){
 
 
 
-# terminal colouring and printing and clearing: 
+# terminal colouring, positional printing and clearing: 
 # trimmed down version of module XXXX in MetaCPAN
 
 my %colours=(black   =>30,red   =>31,green   =>32,yellow   =>33,blue   =>34,magenta   =>35,cyan  =>36,white   =>37,
@@ -149,6 +170,7 @@ sub paintMd{
 	my @decorations=();
 	if ($date ne " "){
 	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){push @decorations,"invert";};
+	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $current){push @decorations,"blink";};
 		foreach my $event (@$cdv){
 				if(substr ($dt,0,6).sprintf("%02d",$date) eq $event->{datestart}){
 					push @decorations,$event->{format};
@@ -210,7 +232,7 @@ sub yearGrid{
 	foreach my $row (1..12/$options->{monthsPerRow}){
 		foreach my $col(1..$options->{monthsPerRow}){
 			$options->{border}=($month == $m)?"double":"none";
-			printAt (($row-1)*9+$options->{rOffset},($col-1)*26+$options->{cOffset},monthGrid($y.sprintf ("%02d",$month)."01",$options));
+			printAt (($row-1)*10+$options->{rOffset},($col-1)*26+$options->{cOffset},monthGrid($y.sprintf ("%02d",$month)."01",$options));
 			$month++;
 		}
 	}
@@ -218,8 +240,9 @@ sub yearGrid{
 	
 
 #printAt(3,3,monthGrid($today,{showWeek=>1,showYear=>1}));
-yearGrid($today,{showWeek=>1,showYear=>1});
-printAt(26,4," ");
+
+#yearGrid($today,{showWeek=>1,showYear=>1}); # update screen
+#printAt(27,4," ");
 
 sub test{
 	foreach my $td ("20241231","20220229","20200229","20202229"){
@@ -235,4 +258,122 @@ sub test{
 	    print "In mm/DD/YYYY form $td is  ",(mdy($td))."\n";
 
 	}
+}
+
+
+# interactivity
+# shamelessly stolen from ped  by nieka@daansystems.com
+# catch terminal resize, # read key presses,act on them;
+
+$| = 1;
+$_ = '' for my (
+    $update, $filename, $currentDate, $currentView, $windowWidth, $windowHeight,
+    $stty,
+);
+$update=1;
+my $namedKeys={
+	32    =>  'space',
+	13    =>  'return',
+	9     =>  'tab',
+	'[Zm' =>  'shifttab',
+	'[Am' =>  'uparrow',
+	'[Bm' =>  'downarrow',
+	'[Cm' =>  'rightarrow',
+	'[Dm' =>  'leftarrow',
+	'[Hm' =>  'home',
+	'[2~m'=>  'insert',
+	'[3~m'=>  'delete',
+	'[Fm' =>  'end',
+	'[5~m'=>  'pageup',
+	'[6~m'=>  'pagedown',
+	'[Fm' =>  'end',
+};
+my $keyActions={
+	'home'      =>sub{$current=$today;},
+	'rightarrow'=>sub{$current=addDay($current,1);},
+	'leftarrow' =>sub{$current=subDay($current,1);},
+	'uparrow'   =>sub{$current=subDay($current,7);},
+	'downarrow' =>sub{$current=addDay($current,7);},
+	'pagedown'  =>sub{$current=addMonth($current);},
+	'pageup'    =>sub{$current=subMonth($current);},
+	'tab'       =>sub{$current=(substr($current,0,4)+1).substr($current,4,4);},
+	'shifttab'  =>sub{$current=(substr($current,0,4)-1).substr($current,4,4);},
+};
+
+run();
+
+$SIG{WINCH} = sub {
+    get_terminal_size();
+    $update = 1;
+    draw();
+};
+
+sub get_terminal_size {
+    ( $windowHeight, $windowWidth ) = split( /\s+/, `stty size` );
+    $windowHeight -= 2;
+}
+
+sub ReadKey {
+    my $key = '';
+    sysread( STDIN, $key, 1 );
+    return $key;
+}
+
+sub ReadLine {
+    return <STDIN>;
+}
+
+sub ReadMode {
+    my ($mode) = @_;
+    if ( $mode == 5 ) {
+        $stty = `stty -g`;
+        chomp($stty);
+        system( 'stty', 'raw', '-echo' );
+    }
+    elsif ( $mode == 0 ) {
+        system( 'stty', $stty );
+    }
+}
+
+sub run {
+    get_terminal_size();
+    binmode(STDIN);
+    ReadMode(5);
+    my $key;
+    while (1) {
+        last if ( !dokey($key) );
+        if ($update){clearScreen(); yearGrid($current,{showWeek=>1,showYear=>1}) }; # update screen
+        $update=0;
+        $key = ReadKey();
+    }
+    ReadMode(0);
+    print "\n";
+}
+
+sub dokey {
+    my ($key) = @_;
+    return 1 unless $key;
+    my $ctrl = ord($key);my $esc="";
+    if    ( $ctrl == 3 )  { return }                  # Ctrl+c = exit;
+    $esc = get_esc() if ($ctrl==27);
+    act(nameKey($ctrl,$esc));    
+    return 1;
+}
+
+#convert key codes to named key
+sub nameKey{my $nk=$_[1]?$_[1]:$_[0];return $namedKeys->{$nk}//chr($nk);}
+
+sub act{ 
+	$keyActions->{$_[0]}->() if ($keyActions->{$_[0]});
+	$update=1;
+	#printAt(0,0,$_[0]."  ");
+}
+
+sub get_esc {
+    my $esc;
+    while ( my $key = ReadKey() ) {
+        $esc .= $key;
+        last if ( $key =~ /[a-z~]/i );
+    }
+    return $esc."m";
 }
