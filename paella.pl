@@ -14,8 +14,11 @@ my $VERSION=0.05;
 my $dateIndex={};
 my $calendar={};
 
-my ($file,$col)=("example.ics", "yellow");
-loadICS($file,$col);
+my @icsFileColours=(["example.ics", "yellow"],["UK_Holidays.ics","green"]);
+foreach (@icsFileColours){
+	loadICS(@$_);
+}
+
 
 
 # set of functions work on Dates in the form of a YYYYMMDD string
@@ -384,7 +387,7 @@ sub get_esc {
 
 
 sub loadICS{
-	my ($file,$col)=@_;
+	our ($file,$col)=@_;
 	open my $ics,"<",$file;
 	$calendar//={events=>[],};
 	our @levels;
