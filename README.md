@@ -7,7 +7,7 @@ Objective is to create a general purpose calendar application in pure perl for t
 * Highlightable (done in Version 0.03)
 * Import ICS files and appropriate highlighting (done in version 0,05)
 * Interactive calendar  (done in version 0.04)
-* Create iCAL files (TODO}
+* Create iCAL files (TODO)
 * Year views and month views (TODO)
 
 ### Version 0.05
