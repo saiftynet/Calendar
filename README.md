@@ -19,6 +19,9 @@ Now uses an ultra-simple ics importer to load dates from an ics file and populat
 * Multiple ics files may be loaded each with a different colour.
 * When a date has events in multiple calendars the colour of the date in the calendar depends on the last calendar imported (of course).
 
+  ![calendar](https://github.com/saiftynet/Calendar/assets/34284663/7a8df133-2a94-46f1-a67f-2fe864c13c2c)
+
+
 
 ### Version 0.04
 
