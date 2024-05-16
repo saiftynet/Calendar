@@ -14,6 +14,10 @@ Objective create a general purpose calendar application in pure perl for the ter
 
 Now uses an ultra-simple ics importer to load dates from an ics file and populates the calendar with these.
 
+* a date index, indeexs events by date (surprise)
+* navigating to date displays even(s) below the calendar coloured as defined when loading ics file
+* multiple ics files may be loaded each with a different colour.
+
 
 ### Version 0.04
 
