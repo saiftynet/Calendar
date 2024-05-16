@@ -1,6 +1,6 @@
 # Calendar
 
-Objective create a general purpose calendar application in pure perl for the terminal
+Objective is to create a general purpose calendar application in pure perl for the terminal.  A monolithic application, i.e one that is standaolne without any dependencies.  It has  slimmed down versions of DateTime (to work only on YYYYMMDD format dates), Term::ANSIColor, and Term::ReadKey, all built into this single file applicaton.  A version may be made using above dependencies if felt necessary.
 
 * Minimal dependencies
 * Customisable (yearview, month view, show week number done in Version 0.01)
