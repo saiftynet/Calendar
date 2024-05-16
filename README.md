@@ -5,9 +5,15 @@ Objective create a general purpose calendar application in pure perl for the ter
 * Minimal dependencies
 * Customisable (yearview, month view, show week number done in Version 0.01)
 * Highlightable (done in Version 0.03)
-* Import ICS files and appropriate highlighting (TODO)
-* Interactive calendar  (TODO)
-* Create iCAL files
+* Import ICS files and appropriate highlighting (done in version 0,05)
+* Interactive calendar  (done in version 0.04)
+* Create iCAL files (TODO}
+* Year views and month views (TODO)
+
+### Version 0.05
+
+Now uses an ultra-simple ics importer to load dates from an ics file and populates the calendar with these.
+
 
 ### Version 0.04
 
