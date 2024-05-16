@@ -14,9 +14,10 @@ Objective is to create a general purpose calendar application in pure perl for t
 
 Now uses an ultra-simple ics importer to load dates from an ics file and populates the calendar with these.
 
-* a date index, indeexs events by date (surprise)
-* navigating to date displays even(s) below the calendar coloured as defined when loading ics file
-* multiple ics files may be loaded each with a different colour.
+* a date index, indexes events by date (surprise)
+* Navigating to date displays event name(s) below the calendar coloured as defined when loading ics file
+* Multiple ics files may be loaded each with a different colour.
+* When a date has events in multiple calendars the colour of the date in the calendar depends on the last calendar imported (of course).
 
 
 ### Version 0.04
