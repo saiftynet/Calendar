@@ -1,0 +1,3 @@
+20240516
+     -`ics` proptype for reading ics files and
+       converting for cunsumption by paella
