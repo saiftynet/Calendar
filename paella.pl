@@ -7,15 +7,14 @@
 use strict; use warnings;
 my $VERSION=0.05;
 
-use Data::Dumper;
-
 # variables  for the ics file importer
-# $cdv contains summary, dtstart and a colour to apply
+# Calendar contain events
+# $dateIndex contains events for each day, its name and a colour to apply
 
-my $cdv=[];
+my $dateIndex={};
 my $calendar={};
 
-my ($file,$col)=("example.ics", "red");
+my ($file,$col)=("example.ics", "yellow");
 loadICS($file,$col);
 
 
@@ -88,11 +87,8 @@ sub valDate{
 
 sub randomDates{
 	foreach (0..50){
-		$cdv=[@$cdv,
-		   {  name     =>"test event",
-			  datestart=>"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28)),
-			  format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}
-		   ]
+		$dateIndex->{"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28))}=[@$$dateIndex,
+		   {  name     =>"test event",format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}];
 	}
 }
 
@@ -180,18 +176,14 @@ sub paintMd{
 	my $painted=$date;
 	my @decorations=();
 	if ($date ne " "){
-	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){push @decorations,"underline";};
-	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $current){push @decorations,"blink invert";};
-		foreach my $event (@$cdv){
-				if(substr ($dt,0,6).sprintf("%02d",$date) eq $event->{datestart}){
-					push @decorations,$event->{format};
-				}
+	    my $fullDate=substr ($dt,0,6).sprintf("%02d",$date);
+	    if ($fullDate eq $today) {push @decorations,"underline";};
+	    if ($fullDate eq $current){push @decorations,"blink invert";};
+	    if ($dateIndex->{$fullDate}) {push @decorations,$dateIndex->{$fullDate}->{format}};
 		}
-		$painted=paint($date,join(" ",@decorations));
-	}
+	$painted=paint($date,join(" ",@decorations));
 
 	return " "x(3-length $date).$painted;#paint($date,$dt,$options);
-	
 }
 
 sub center{  # a 3 character positioned in middle of other 3 character blocks
@@ -245,7 +237,14 @@ sub yearGrid{
 		}
 	}
 }
-	
+
+sub updateAction{
+	clearScreen(); yearGrid($current,{showWeek=>1,showYear=>1}) ;
+	if ($dateIndex->{$current}){
+		printAt(30,20,"");
+		foreach ($dateIndex->{$current}){print paint($_->{name},$_->{format}), " "};
+	}
+}
 
 #printAt(3,3,monthGrid($today,{showWeek=>1,showYear=>1}));
 
@@ -344,7 +343,7 @@ sub run {
     my $key;
     while (1) {
         last if ( !dokey($key) );
-        if ($update){clearScreen(); yearGrid($current,{showWeek=>1,showYear=>1}) }; # update screen
+        updateAction() if ($update); # update screen
         $update=0;
         $key = ReadKey();
     }
@@ -414,10 +413,10 @@ sub loadICS{
 			 if ($levels[-1]=~/EVENT/){
 				if (%$item){
 					push @{$calendar->{events}},{%$item} if %$item;
-					$cdv=[@$cdv,{
-						  name     =>$item->{SUMMARY},
-						  datestart=>substr ($item->{DTSTART},0,8),
-						  format   =>$col,}];
+					$dateIndex->{substr ($item->{DTSTART},0,8)}//=[];
+					$dateIndex->{substr ($item->{DTSTART},0,8)}={
+						name     =>$item->{SUMMARY},
+						format   =>$col,};
 				}
 				$item={};
 			}
