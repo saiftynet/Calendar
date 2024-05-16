@@ -5,7 +5,18 @@
 ############################################################################# 
 
 use strict; use warnings;
-my $VERSION=0.04;
+my $VERSION=0.05;
+
+use Data::Dumper;
+
+# variables  for the ics file importer
+# $cdv contains summary, dtstart and a colour to apply
+
+my $cdv=[];
+my $calendar={};
+
+my ($file,$col)=("example.ics", "red");
+loadICS($file,$col);
 
 
 # set of functions work on Dates in the form of a YYYYMMDD string
@@ -74,15 +85,16 @@ sub valDate{
 	return "Invalid date : $_[0];  date too big for month" unless ((($m.$d eq "0229") && ly($y.$m.$d)) || ($dm[$m-1]>=$d) );
 	return "Valid";
 }
-my $cdv=[];
-foreach (0..50){
-	$cdv=[@$cdv,
-	   {  name     =>"test event",
-          datestart=>"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28)),
-          format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}
-       ]
-}
 
+sub randomDates{
+	foreach (0..50){
+		$cdv=[@$cdv,
+		   {  name     =>"test event",
+			  datestart=>"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28)),
+			  format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}
+		   ]
+	}
+}
 
 
 # terminal colouring, positional printing and clearing: 
@@ -112,9 +124,9 @@ sub border{
 	foreach (0..$#$grid){
 		$grid->[$_]=[$borders{$style}{l},@{$grid->[$_]},$borders{$style}{r}];
 	};
-	$grid=[[$borders{$style}{tl},($borders{$style}{t}x$width),$borders{$style}{tr}],
+	$grid=[[$borders{$style}{tl},($borders{$style}{t}x($width-2)),$borders{$style}{tr}],
 	        @$grid,
-	        [$borders{$style}{bl},($borders{$style}{b}x$width),$borders{$style}{br}],];
+	        [$borders{$style}{bl},($borders{$style}{b}x($width-2)),$borders{$style}{br}],];
 	        return $grid;
 	
 }
@@ -162,15 +174,14 @@ sub printAt{
   print "\n"; # seems to flush the STDOUT buffer...if not then set $| to 1 
 };
 
-
 sub paintMd{
 	my ($date,$dt,$options)=@_;
 	#return unless $date;
 	my $painted=$date;
 	my @decorations=();
 	if ($date ne " "){
-	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){push @decorations,"invert";};
-	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $current){push @decorations,"blink";};
+	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $today){push @decorations,"underline";};
+	    if (substr ($dt,0,6).sprintf("%02d",$date) eq $current){push @decorations,"blink invert";};
 		foreach my $event (@$cdv){
 				if(substr ($dt,0,6).sprintf("%02d",$date) eq $event->{datestart}){
 					push @decorations,$event->{format};
@@ -192,15 +203,12 @@ sub center{  # a 3 character positioned in middle of other 3 character blocks
 	return [("   ")x$pre, @split,("   ")x$post];
 }
 
-
 # Creating grids for month view
 # The month view is 
 sub monthGrid{
 	my ($dt,$options)=@_;
 	my ($y,$m,$d)=spDt($dt);
 	$options->{border}//="thin";
-	$options->{cOffset}//=2;
-	$options->{rOffset}//=1;
 	
 	my @paddedMonth=((" ")x(d1m($dt)-1),(1..dim($dt)) );
 	@paddedMonth=(@paddedMonth,(" ")x(6-($#paddedMonth%7)));
@@ -211,10 +219,10 @@ sub monthGrid{
 	$grid=[[map {" ".substr($_,0,2)}@wdn],@$grid];
 	$grid->[0]->[6].=colour("reset");
 	if ($options->{showWeek}){
-		$grid->[0]=[colour("underline")." w|",@{$grid->[0]}];
-		my $weekNo=woy(substr ($dt,0,6)."01");
+		$grid->[0]=[colour("underline")." w│",@{$grid->[0]}];
+		my $weekNo=woy(substr ($dt,0,6)."01"); # for the 1st day of month
 		foreach(1..$#$grid){
-			$grid->[$_]=[sprintf ("%-3s",$weekNo++."|"),@{$grid->[$_]}];
+			$grid->[$_]=[sprintf ("%2s",$weekNo++)."│",@{$grid->[$_]}];
 		}
 	}
 	$grid=[center($mn[$m-1].($options->{showYear}?" ".$y:""),$options->{showWeek}?8:7),@$grid];
@@ -313,25 +321,19 @@ sub get_terminal_size {
     $windowHeight -= 2;
 }
 
-sub ReadKey {
-    my $key = '';
-    sysread( STDIN, $key, 1 );
-    return $key;
-}
+sub ReadKey { my $key = ''; sysread( STDIN, $key, 1 );  return $key;}
 
-sub ReadLine {
-    return <STDIN>;
-}
+sub ReadLine { return <STDIN>;}
 
 sub ReadMode {
     my ($mode) = @_;
     if ( $mode == 5 ) {
         $stty = `stty -g`;
         chomp($stty);
-        system( 'stty', 'raw', '-echo' );
+        system( 'stty', 'raw', '-echo' );# find Windows equivalent
     }
     elsif ( $mode == 0 ) {
-        system( 'stty', $stty );
+        system( 'stty', $stty );         # find Windows equivalent
     }
 }
 
@@ -354,7 +356,7 @@ sub dokey {
     my ($key) = @_;
     return 1 unless $key;
     my $ctrl = ord($key);my $esc="";
-    if    ( $ctrl == 3 )  { return }                  # Ctrl+c = exit;
+    return if ($ctrl == 3);                 # Ctrl+c = exit;
     $esc = get_esc() if ($ctrl==27);
     act(nameKey($ctrl,$esc));    
     return 1;
@@ -377,3 +379,64 @@ sub get_esc {
     }
     return $esc."m";
 }
+
+# This is an ultra simplistic ics file importer
+# Populates $calendar and $cdv with dates from an ics file
+
+
+sub loadICS{
+	my ($file,$col)=@_;
+	open my $ics,"<",$file;
+	$calendar//={events=>[],};
+	our @levels;
+	my $lastLine="";
+	our $item={};
+	while  (my $line=<$ics>){
+	   chomp $line;
+	   if($lastLine eq ""){
+		   $lastLine = $line;
+	   }
+	   elsif ($line=~/^\s/){
+		   $lastLine.=$line;
+		}
+		else{
+			parseLine($lastLine);
+			$lastLine=$line;
+		}
+	}
+	sub parseLine{
+		my $line=shift;
+		 if ($line=~/^BEGIN:V(.*)$/){
+			 push @levels,$1;
+			 return;
+		 }
+		 elsif ($line=~/^END:V(.*)$/){                          # end of section 
+			 if ($levels[-1]=~/EVENT/){
+				if (%$item){
+					push @{$calendar->{events}},{%$item} if %$item;
+					$cdv=[@$cdv,{
+						  name     =>$item->{SUMMARY},
+						  datestart=>substr ($item->{DTSTART},0,8),
+						  format   =>$col,}];
+				}
+				$item={};
+			}
+			pop @levels;
+		}
+		elsif ($levels[-1]=~/EVENT/){
+			my @parts=($line=~/^([A-Z\-]+)(\;[^\;\:]+)?(\:.*)$/);
+			$item->{$parts[0]}=substr $parts[-1],1 if $parts[0];
+		}
+		elsif ($levels[-1]=~/CALENDAR/){
+			my @parts=($line=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
+			$calendar->{$parts[0]}=substr $parts[-1],1 if $parts[0];
+		}
+		else{
+			$item->{$levels[-1]}//={};
+			my @parts=($line=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
+			$item->{$levels[-1]}->{$parts[0]}=substr $parts[-1],1 if $parts[0];
+		}
+	}
+	close $ics;
+}
+
