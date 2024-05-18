@@ -14,7 +14,7 @@ my $VERSION=0.05;
 my $dateIndex={};
 my $calendar={};
 
-my @icsFileColours=(["example.ics", "yellow"],["UK_Holidays.ics","green"]);
+my @icsFileColours=(["example.ics", "red"],["UK_Holidays.ics","cyan"]);
 foreach (@icsFileColours){
 	loadICS(@$_);
 }
@@ -45,14 +45,18 @@ sub spDt{ return ($_[0]=~/(\d{4})(\d{2})(\d{2})/)};
 sub jDt{ return sprintf ("%04d",$_[0]).sprintf ("%02d",$_[1]).sprintf ("%02d",$_[2])};
 # test leap year                           
 sub ly{my ($y,$m,$d)=spDt($_[0]);return (($y%4) - ($y%100) + ($y%400))?0:1;};
-# day 1 of year Gregorian
-sub d1greg{my ($y,$m,$d)=spDt($_[0]);return 1+(5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
+# day 1 of year Gregorian Guassian Method ( https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
+#sub d1greg{my ($y,$m,$d)=spDt($_[0]	);return (1+5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
+# day 1 of year Gregorian  Zeller Rule (m=11 for january, k=1 first day,D is substr($_[0],2,2), C=substr($_[0],0,2) ) (wikpedia F=k+ [(13*m-1)/5] +D+ [D/4] +[C/4]-2*C where
+#sub d1greg{ my $Y=substr($_[0],0,4)-1;my $zeller=  (int(13*14/5) + int(($Y%100)/4) + int((int($Y/100))/4)+ 1 +($Y%100)-2*int($Y/100))%7 ; return ($zeller +6)%7};
+# day 1 of year Gregorian lookup from list 28 year cycle;
+sub d1greg{ my $Y=substr($_[0],0,4);return (0,2,3,4, 5,0,1,2, 3,5,6,0, 1,3,4,5, 6,1,2,3, 4,6,0,1, 2,4,5,6)[($Y-1996)%28];}
 # day of year
-sub doy{my ($y,$m,$d)=spDt($_[0]);;return $d+$acc[$m-1]+((ly(jDt($y,$m,$d))&&($m>2))?1:0);}
+sub doy{my ($y,$m,$d)=spDt($_[0]);return $d+$acc[$m-1]+((ly(jDt($y,$m,$d))&&($m>2))?1:0);}
 # week of year
 sub woy{return int((doy($_[0])+6)/7);}
 # day of date
-sub day{my ($doy,$d1y)=(doy($_[0]),d1greg($_[0]));return 1+($doy-$d1y)%7;};
+sub day{my ($doy,$d1y)=(doy($_[0]),d1greg($_[0]));return ($doy+$d1y-1)%7;};
 # 1st day of month
 sub d1m{my ($y,$m,$d)=spDt($_[0]);return day($y.$m."01")};
 # days in month
@@ -205,7 +209,7 @@ sub monthGrid{
 	my ($y,$m,$d)=spDt($dt);
 	$options->{border}//="thin";
 	
-	my @paddedMonth=((" ")x(d1m($dt)-1),(1..dim($dt)) );
+	my @paddedMonth=((" ")x(d1m($dt)),(1..dim($dt)) );
 	@paddedMonth=(@paddedMonth,(" ")x(6-($#paddedMonth%7)));
 	my $grid=[];
 	foreach my $row (0..(@paddedMonth/7-1)){
