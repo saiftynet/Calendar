@@ -10,6 +10,12 @@ Objective is to create a general purpose calendar application in pure perl for t
 * Create iCAL files (TODO)
 * Year views and month views (TODO)
 
+### Version 0.06
+
+* Now detects terminal window size changes and displays the number of calendars that fit
+* Keeps current month visible during navigation
+* Gradually transforming into a Modulino with paella calling the Module Term::Graille::SuperCal or Calendar::SuperCal with parameters passed when called from the command line. The module will allow the use of calendar views within other applications without the need from any dependencies outside Perl Core.
+
 ### Version 0.05
 
 Now uses an ultra-simple ics importer to load dates from an ics file and populates the calendar with these.
