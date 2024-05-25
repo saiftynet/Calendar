@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-
 ############################################################################# 
 ####        Paella:   A Calendar Application for the Terminal             ###
 ############################################################################# 
@@ -10,9 +9,9 @@ my $VERSION=0.06;
 # variables  for the ics file importer
 # Calendar contain events
 # $dateIndex contains events for each day, its name and a colour to apply
-
 my $dateIndex={};
 my $calendar={};
+
 my $options={showWeek=>1,showYear=>1};
 
 my @icsFileColours=(["example.ics", "red"],["UK_Holidays.ics","cyan"]);
@@ -45,11 +44,11 @@ sub jDt{ return sprintf ("%04d",$_[0]).sprintf ("%02d",$_[1]).sprintf ("%02d",$_
 # test leap year                           
 sub ly{my ($y,$m,$d)=spDt($_[0]);return (($y%4) - ($y%100) + ($y%400))?0:1;};
 # day 1 of year Gregorian Guassian Method ( https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
-#sub d1greg{my ($y,$m,$d)=spDt($_[0]	);return (1+5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
+sub d1greg{my ($y,$m,$d)=spDt($_[0]	);return (1+5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
 # day 1 of year Gregorian  Zeller Rule (m=11 for january, k=1 first day,D is substr($_[0],2,2), C=substr($_[0],0,2) ) (wikpedia F=k+ [(13*m-1)/5] +D+ [D/4] +[C/4]-2*C where
 #sub d1greg{ my $Y=substr($_[0],0,4)-1;my $zeller=  (int(13*14/5) + int(($Y%100)/4) + int((int($Y/100))/4)+ 1 +($Y%100)-2*int($Y/100))%7 ; return ($zeller +6)%7};
 # day 1 of year Gregorian lookup from list 28 year cycle;
-sub d1greg{ my $Y=substr($_[0],0,4);return (0,2,3,4, 5,0,1,2, 3,5,6,0, 1,3,4,5, 6,1,2,3, 4,6,0,1, 2,4,5,6)[($Y-1996)%28];}
+#sub d1greg{ my $Y=substr($_[0],0,4);return (0,2,3,4, 5,0,1,2, 3,5,6,0, 1,3,4,5, 6,1,2,3, 4,6,0,1, 2,4,5,6)[($Y-1996)%28];}
 # day of year
 sub doy{my ($y,$m,$d)=spDt($_[0]);return $d+$acc[$m-1]+((ly(jDt($y,$m,$d))&&($m>2))?1:0);}
 # week of year
@@ -91,15 +90,8 @@ sub valDate{
 	return "Valid";
 }
 
-sub randomDates{
-	foreach (0..50){
-		$dateIndex->{"2024".sprintf ("%02d",1+int ( rand()*12)).sprintf ("%02d",1+int ( rand()*28))}=[@$$dateIndex,
-		   {  name     =>"test event",format=>(qw/red yellow green blue cyan magenta/)[rand()*6]}];
-	}
-}
-
 # terminal colouring, positional printing and clearing: 
-# trimmed down version of module XXXX in MetaCPAN
+# trimmed down version of module Tern::ANSIColor in MetaCPAN
 
 my %colours=(black   =>30,red   =>31,green   =>32,yellow   =>33,blue   =>34,magenta   =>35,cyan  =>36,white   =>37,
                on_black=>40,on_red=>41,on_green=>42,on_yellow=>43,on_blue=>44,on_magenta=>4,on_cyan=>46,on_white=>47,
@@ -128,7 +120,7 @@ sub border{
 	$grid=[[$borders{$style}{tl},($borders{$style}{t}x($width-2)),$borders{$style}{tr}],
 	        @$grid,
 	        [$borders{$style}{bl},($borders{$style}{b}x($width-2)),$borders{$style}{br}],];
-	        return $grid;
+	return $grid;
 }
 
 sub colour{
@@ -173,15 +165,14 @@ sub printAt{
 };
 
 sub paintMd{
-	my ($date,$dt)=@_; #my ($date,$dt,$options)=@_;
-	#return unless $date;
+	my ($date,$dt)=@_; 
 	my $painted=$date;
 	my @decorations=();
 	if ($date ne " "){
 	    my $fullDate=substr ($dt,0,6).sprintf("%02d",$date);
 	    if ($fullDate eq $today) {push @decorations,"underline";};
 	    if ($fullDate eq $options->{current}){push @decorations,"blink invert";};
-	    if ($dateIndex->{$fullDate}) {push @decorations,$dateIndex->{$fullDate}->{format}};
+	    if ($dateIndex->{$fullDate}) {push @decorations,$dateIndex->{$fullDate}->[0]->{format}};
 		}
 	$painted=paint($date,join(" ",@decorations));
 
@@ -198,9 +189,9 @@ sub center{  # a 3 character positioned in middle of other 3 character blocks
 }
 
 # Creating grids for month view
-# The month view is 
+
 sub monthGrid{
-	my ($dt)=@_;#my ($dt,$options)=@_;
+	my ($dt)=@_;
 	my ($y,$m,$d)=spDt($dt);
 	$options->{border}//="thin";
 	
@@ -227,9 +218,6 @@ sub monthGrid{
 sub yearGrid{
 	my ($dt)=@_;#my ($dt,$options)=@_;
 	my ($y,$m,$d)=spDt($dt);
-	$options->{monthsPerRow}//=4;
-	$options->{monthRows}//=3;#12/$options->{monthsPerRow};
-	#$options->{monthRows}=2;
 	$options->{startMonth}//=1;
 	while ($m>($options->{startMonth}-1+$options->{monthsPerRow}*$options->{monthRows})){
 		$options->{startMonth}+=$options->{monthsPerRow};
@@ -237,8 +225,10 @@ sub yearGrid{
 	while ($m<$options->{startMonth}){
 		$options->{startMonth}-=$options->{monthsPerRow};
 	};
-	$options->{cOffset}//=10;
-	$options->{rOffset}//=1;
+	$options->{startMonth}=1 if $options->{startMonth}<0;
+	while ($m<$options->{startMonth}){
+		$options->{startMonth}-=$options->{monthsPerRow};
+	};
 	my $month=$options->{startMonth};	
 	foreach my $row (1..$options->{monthRows}){
 		foreach my $col(1..$options->{monthsPerRow}){
@@ -253,52 +243,14 @@ sub yearGrid{
 sub updateAction{
 	clearScreen(); yearGrid($options->{current},$options) ;
 	if ($dateIndex->{$options->{current}}){
-		printAt(10*$options->{monthRows},20,"");
-		foreach ($dateIndex->{$options->{current}}){print paint($_->{name},$_->{format}), " "};
+		printAt(10*$options->{monthRows}+$options->{rOffset}-2,20,"");
+		my $summaries="";
+		foreach (@{$dateIndex->{$options->{current}}}){$summaries.= paint($_->{name},$_->{format})." "};
+		$summaries =~s/[\r\n]//g;
+		print $summaries;
 	}
 }
 
-sub updateScreen{
-	my ( $windowHeight, $windowWidth)=@_;
-	$options->{monthsPerRow} =  int($windowWidth/26);
-	die unless $options->{monthsPerRow};
-	$options->{monthsPerRow} =  4 if ($options->{monthsPerRow} ==5);
-	$options->{monthRows}   =  int($windowHeight/10);
-	$options->{monthRows}-- while ($options->{monthsPerRow}*$options->{monthRows}>12);
-	$options->{cOffset}      =  int(($windowWidth- $options->{monthsPerRow}*26)/2);
-	updateAction();
-	
-}
-
-#printAt(3,3,monthGrid($today,{showWeek=>1,showYear=>1}));
-
-#yearGrid($today,{showWeek=>1,showYear=>1}); # update screen
-#printAt(27,4," ");
-
-sub test{
-	foreach my $td ("20241231","20220229","20200229","20202229"){
-		print "\n";
-		print  "Testing validity of $td ..... " ,valDate($td)."\n" ;
-		next unless  valDate($td) eq "Valid";
-	    print "First day of year  $td should be xxxxx and is: ",d1greg($td),"\n";
-	    print "First day of month $td should be xxxxx and is: ",d1m($td),"\n";
-	    print "$td is ",(ly($td)?"":" not ")."a leap year\n";
-	    print "$td falls on ",(day($td))."  day which is a ".dn($td)."\n";
-	    print "$td is the ",(doy($td))." day of the year\n";
-	    print "In DD/MM/YYYY form $td is  ",(dmy($td))."\n";
-	    print "In mm/DD/YYYY form $td is  ",(mdy($td))."\n";
-	}
-}
-
-
-
-sub splash{
-my $splash=<<END;	
-
- 
-END
- 	
-}
 # interactivity
 # shamelessly stolen from ped  by nieka@daansystems.com
 # catch terminal resize, # read key presses,act on them;
@@ -341,7 +293,7 @@ my $keyActions={
 $SIG{WINCH} = sub {
     get_terminal_size();
     $update = 1;
-    updateScreen(get_terminal_size());
+	updateAction();
 };
 
 run();
@@ -349,7 +301,13 @@ run();
 sub get_terminal_size {
     ( $windowHeight, $windowWidth ) = split( /\s+/, `stty size` );
     $windowHeight -= 2;
-    return ($windowHeight, $windowWidth);
+    $options->{monthsPerRow} =  int($windowWidth/26);
+	die unless $options->{monthsPerRow};
+	$options->{monthsPerRow} =  4 if ($options->{monthsPerRow} ==5);
+	$options->{monthRows}   =  int($windowHeight/10);
+	$options->{monthRows}-- while ($options->{monthsPerRow}*$options->{monthRows}>12);
+	$options->{cOffset}      =  int(($windowWidth- $options->{monthsPerRow}*26)/2);
+	$options->{rOffset}      =  int(($windowHeight- $options->{monthRows}*10)/2)+2;
 }
 
 sub ReadKey { my $key = ''; sysread( STDIN, $key, 1 );  return $key;}
@@ -414,7 +372,6 @@ sub get_esc {
 # This is an ultra simplistic ics file importer
 # Populates $calendar and $cdv with dates from an ics file
 
-
 sub loadICS{
 	our ($file,$col)=@_;
 	open my $ics,"<",$file;
@@ -446,9 +403,9 @@ sub loadICS{
 				if (%$item){
 					push @{$calendar->{events}},{%$item} if %$item;
 					$dateIndex->{substr ($item->{DTSTART},0,8)}//=[];
-					$dateIndex->{substr ($item->{DTSTART},0,8)}={
+					$dateIndex->{substr ($item->{DTSTART},0,8)}=[{
 						name     =>$item->{SUMMARY},
-						format   =>$col,};
+						format   =>$col,},@{$dateIndex->{substr ($item->{DTSTART},0,8)}},];
 				}
 				$item={};
 			}
@@ -471,9 +428,4 @@ sub loadICS{
 	close $ics;
 }
 
-package SuperCal;
-   my $VERSION=0.01;
-
-
-1
 ;
