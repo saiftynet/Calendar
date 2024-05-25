@@ -5,7 +5,7 @@
 ############################################################################# 
 
 use strict; use warnings;
-my $VERSION=0.05;
+my $VERSION=0.06;
 
 # variables  for the ics file importer
 # Calendar contain events
@@ -13,13 +13,12 @@ my $VERSION=0.05;
 
 my $dateIndex={};
 my $calendar={};
+my $options={showWeek=>1,showYear=>1};
 
 my @icsFileColours=(["example.ics", "red"],["UK_Holidays.ics","cyan"]);
 foreach (@icsFileColours){
 	loadICS(@$_);
 }
-
-
 
 # set of functions work on Dates in the form of a YYYYMMDD string
 # These could be easily replaced with more robust DateTime  or
@@ -27,8 +26,8 @@ foreach (@icsFileColours){
 # limits needless conversions to a minimum.
 
 my $today=today();
-my $current=$today;
-# die $current;
+$options->{current}=$today;
+# die $options->{current};
 # accummulated days of year
 my @acc=(0,31,59,90,120,151,181,212,243,273,304,334);
 # Names of days of week
@@ -99,7 +98,6 @@ sub randomDates{
 	}
 }
 
-
 # terminal colouring, positional printing and clearing: 
 # trimmed down version of module XXXX in MetaCPAN
 
@@ -131,7 +129,6 @@ sub border{
 	        @$grid,
 	        [$borders{$style}{bl},($borders{$style}{b}x($width-2)),$borders{$style}{br}],];
 	        return $grid;
-	
 }
 
 sub colour{
@@ -148,14 +145,12 @@ sub paint{
 	return colour($fmt).$txt.colour("reset") ;
 }
 
-
 sub stripColours{
   my $line=shift;
   return "" unless defined $line;
   $line=~s/\033\[[^m]+m//g;
   return $line;
 }
-
 
 sub clearScreen{
 	system($^O eq 'MSWin32'?'cls':'clear');
@@ -178,14 +173,14 @@ sub printAt{
 };
 
 sub paintMd{
-	my ($date,$dt,$options)=@_;
+	my ($date,$dt)=@_; #my ($date,$dt,$options)=@_;
 	#return unless $date;
 	my $painted=$date;
 	my @decorations=();
 	if ($date ne " "){
 	    my $fullDate=substr ($dt,0,6).sprintf("%02d",$date);
 	    if ($fullDate eq $today) {push @decorations,"underline";};
-	    if ($fullDate eq $current){push @decorations,"blink invert";};
+	    if ($fullDate eq $options->{current}){push @decorations,"blink invert";};
 	    if ($dateIndex->{$fullDate}) {push @decorations,$dateIndex->{$fullDate}->{format}};
 		}
 	$painted=paint($date,join(" ",@decorations));
@@ -205,7 +200,7 @@ sub center{  # a 3 character positioned in middle of other 3 character blocks
 # Creating grids for month view
 # The month view is 
 sub monthGrid{
-	my ($dt,$options)=@_;
+	my ($dt)=@_;#my ($dt,$options)=@_;
 	my ($y,$m,$d)=spDt($dt);
 	$options->{border}//="thin";
 	
@@ -230,27 +225,49 @@ sub monthGrid{
 }
 
 sub yearGrid{
-	my ($dt,$options)=@_;
+	my ($dt)=@_;#my ($dt,$options)=@_;
 	my ($y,$m,$d)=spDt($dt);
 	$options->{monthsPerRow}//=4;
+	$options->{monthRows}//=3;#12/$options->{monthsPerRow};
+	#$options->{monthRows}=2;
+	$options->{startMonth}//=1;
+	while ($m>($options->{startMonth}-1+$options->{monthsPerRow}*$options->{monthRows})){
+		$options->{startMonth}+=$options->{monthsPerRow};
+	};
+	while ($m<$options->{startMonth}){
+		$options->{startMonth}-=$options->{monthsPerRow};
+	};
 	$options->{cOffset}//=10;
 	$options->{rOffset}//=1;
-	my $month=1;
-	foreach my $row (1..12/$options->{monthsPerRow}){
+	my $month=$options->{startMonth};	
+	foreach my $row (1..$options->{monthRows}){
 		foreach my $col(1..$options->{monthsPerRow}){
 			$options->{border}=($month == $m)?"double":"none";
 			printAt (($row-1)*10+$options->{rOffset},($col-1)*26+$options->{cOffset},monthGrid($y.sprintf ("%02d",$month)."01",$options));
 			$month++;
+			if ($month>12){$month=1;$y++}
 		}
 	}
 }
 
 sub updateAction{
-	clearScreen(); yearGrid($current,{showWeek=>1,showYear=>1}) ;
-	if ($dateIndex->{$current}){
-		printAt(30,20,"");
-		foreach ($dateIndex->{$current}){print paint($_->{name},$_->{format}), " "};
+	clearScreen(); yearGrid($options->{current},$options) ;
+	if ($dateIndex->{$options->{current}}){
+		printAt(10*$options->{monthRows},20,"");
+		foreach ($dateIndex->{$options->{current}}){print paint($_->{name},$_->{format}), " "};
 	}
+}
+
+sub updateScreen{
+	my ( $windowHeight, $windowWidth)=@_;
+	$options->{monthsPerRow} =  int($windowWidth/26);
+	die unless $options->{monthsPerRow};
+	$options->{monthsPerRow} =  4 if ($options->{monthsPerRow} ==5);
+	$options->{monthRows}   =  int($windowHeight/10);
+	$options->{monthRows}-- while ($options->{monthsPerRow}*$options->{monthRows}>12);
+	$options->{cOffset}      =  int(($windowWidth- $options->{monthsPerRow}*26)/2);
+	updateAction();
+	
 }
 
 #printAt(3,3,monthGrid($today,{showWeek=>1,showYear=>1}));
@@ -270,11 +287,18 @@ sub test{
 	    print "$td is the ",(doy($td))." day of the year\n";
 	    print "In DD/MM/YYYY form $td is  ",(dmy($td))."\n";
 	    print "In mm/DD/YYYY form $td is  ",(mdy($td))."\n";
-
 	}
 }
 
 
+
+sub splash{
+my $splash=<<END;	
+
+ 
+END
+ 	
+}
 # interactivity
 # shamelessly stolen from ped  by nieka@daansystems.com
 # catch terminal resize, # read key presses,act on them;
@@ -303,28 +327,29 @@ my $namedKeys={
 	'[Fm' =>  'end',
 };
 my $keyActions={
-	'home'      =>sub{$current=$today;},
-	'rightarrow'=>sub{$current=addDay($current,1);},
-	'leftarrow' =>sub{$current=subDay($current,1);},
-	'uparrow'   =>sub{$current=subDay($current,7);},
-	'downarrow' =>sub{$current=addDay($current,7);},
-	'pagedown'  =>sub{$current=addMonth($current);},
-	'pageup'    =>sub{$current=subMonth($current);},
-	'tab'       =>sub{$current=(substr($current,0,4)+1).substr($current,4,4);},
-	'shifttab'  =>sub{$current=(substr($current,0,4)-1).substr($current,4,4);},
+	'home'      =>sub{$options->{current}=$today;},
+	'rightarrow'=>sub{$options->{current}=addDay($options->{current},1);},
+	'leftarrow' =>sub{$options->{current}=subDay($options->{current},1);},
+	'uparrow'   =>sub{$options->{current}=subDay($options->{current},7);},
+	'downarrow' =>sub{$options->{current}=addDay($options->{current},7);},
+	'pagedown'  =>sub{$options->{current}=addMonth($options->{current});},
+	'pageup'    =>sub{$options->{current}=subMonth($options->{current});},
+	'tab'       =>sub{$options->{current}=(substr($options->{current},0,4)+1).substr($options->{current},4,4);},
+	'shifttab'  =>sub{$options->{current}=(substr($options->{current},0,4)-1).substr($options->{current},4,4);},
 };
-
-run();
 
 $SIG{WINCH} = sub {
     get_terminal_size();
     $update = 1;
-    draw();
+    updateScreen(get_terminal_size());
 };
+
+run();
 
 sub get_terminal_size {
     ( $windowHeight, $windowWidth ) = split( /\s+/, `stty size` );
     $windowHeight -= 2;
+    return ($windowHeight, $windowWidth);
 }
 
 sub ReadKey { my $key = ''; sysread( STDIN, $key, 1 );  return $key;}
@@ -446,3 +471,9 @@ sub loadICS{
 	close $ics;
 }
 
+package SuperCal;
+   my $VERSION=0.01;
+
+
+1
+;
