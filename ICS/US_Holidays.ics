@@ -1,0 +1,332 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Calendar Labs//Calendar 1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:US Holidays
+X-WR-TIMEZONE:Etc/GMT
+BEGIN:VEVENT
+SUMMARY:New Year's Day
+DTSTART;VALUE=DATE:20230101
+DTEND;VALUE=DATE:20230101
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about New Year's Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02054911697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:New Year's Day Holiday
+DTSTART;VALUE=DATE:20230102
+DTEND;VALUE=DATE:20230102
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about New Year's Day Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02055c01697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:M L King Day
+DTSTART;VALUE=DATE:20230116
+DTEND;VALUE=DATE:20230116
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about M L King Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02056c11697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Presidents' Day
+DTSTART;VALUE=DATE:20230220
+DTEND;VALUE=DATE:20230220
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Presidents' Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02058811697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Good Friday
+DTSTART;VALUE=DATE:20230407
+DTEND;VALUE=DATE:20230407
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Good Friday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02059951697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Sunday
+DTSTART;VALUE=DATE:20230409
+DTEND;VALUE=DATE:20230409
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Easter Sunday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205a8f1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Memorial Day
+DTSTART;VALUE=DATE:20230529
+DTEND;VALUE=DATE:20230529
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Memorial Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205b871697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Juneteenth
+DTSTART;VALUE=DATE:20230619
+DTEND;VALUE=DATE:20230619
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Juneteenth. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205c871697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Independence Day
+DTSTART;VALUE=DATE:20230704
+DTEND;VALUE=DATE:20230704
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Independence Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205da11697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Labor Day
+DTSTART;VALUE=DATE:20230904
+DTEND;VALUE=DATE:20230904
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Labor Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205ea81697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Columbus Day
+DTSTART;VALUE=DATE:20231009
+DTEND;VALUE=DATE:20231009
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Columbus Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0205fae1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Veterans Day
+DTSTART;VALUE=DATE:20231111
+DTEND;VALUE=DATE:20231111
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Veterans Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02060db1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Thanksgiving Day
+DTSTART;VALUE=DATE:20231123
+DTEND;VALUE=DATE:20231123
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Thanksgiving Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02061fe1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Christmas
+DTSTART;VALUE=DATE:20231225
+DTEND;VALUE=DATE:20231225
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Christmas. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02063071697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:New Year's Day
+DTSTART;VALUE=DATE:20240101
+DTEND;VALUE=DATE:20240101
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about New Year's Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02064121697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:M L King Day
+DTSTART;VALUE=DATE:20240115
+DTEND;VALUE=DATE:20240115
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about M L King Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02065421697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Presidents' Day
+DTSTART;VALUE=DATE:20240219
+DTEND;VALUE=DATE:20240219
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Presidents' Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02066ae1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Good Friday
+DTSTART;VALUE=DATE:20240329
+DTEND;VALUE=DATE:20240329
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Good Friday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02067c81697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Sunday
+DTSTART;VALUE=DATE:20240331
+DTEND;VALUE=DATE:20240331
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Easter Sunday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02069991697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Memorial Day
+DTSTART;VALUE=DATE:20240527
+DTEND;VALUE=DATE:20240527
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Memorial Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0206b761697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Juneteenth
+DTSTART;VALUE=DATE:20240619
+DTEND;VALUE=DATE:20240619
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Juneteenth. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0206d8a1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Independence Day
+DTSTART;VALUE=DATE:20240704
+DTEND;VALUE=DATE:20240704
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Independence Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0206eca1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Labor Day
+DTSTART;VALUE=DATE:20240902
+DTEND;VALUE=DATE:20240902
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Labor Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf0206fe31697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Columbus Day
+DTSTART;VALUE=DATE:20241014
+DTEND;VALUE=DATE:20241014
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Columbus Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02071131697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Veterans Day
+DTSTART;VALUE=DATE:20241111
+DTEND;VALUE=DATE:20241111
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Veterans Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf020722e1697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Thanksgiving Day
+DTSTART;VALUE=DATE:20241128
+DTEND;VALUE=DATE:20241128
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Thanksgiving Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02073461697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Christmas
+DTSTART;VALUE=DATE:20241225
+DTEND;VALUE=DATE:20241225
+LOCATION:United States
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/?utm_source=calendarlabs&utm_medium=web&utm_campaign=ical to know more about Christmas. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baf02075171697361666@calendarlabs.com
+DTSTAMP:20231015T092106Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR
