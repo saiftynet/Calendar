@@ -15,6 +15,7 @@ Objective is to create a general purpose calendar application in pure perl for t
 * Now detects terminal window size changes and displays the number of months that fit
 * Keeps current month visible during navigation
 * Shows summaries for the current date derived from loaded calendar files.
+* Loads multiple ICS files from a given directory
 
 ### Version 0.05
 
