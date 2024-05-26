@@ -1,0 +1,404 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Calendar Labs//Calendar 1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:UK Holidays
+X-WR-TIMEZONE:Etc/GMT
+BEGIN:VEVENT
+SUMMARY:New Year's Day
+DTSTART;VALUE=DATE:20230101
+DTEND;VALUE=DATE:20230101
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/new-years-day.php to know more about New Year's Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda990c11697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:New Year's Day Holiday
+DTSTART;VALUE=DATE:20230102
+DTEND;VALUE=DATE:20230102
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/new-years-day.php to know more about New Year's Day Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda991df1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:2nd January (SCT)
+DTSTART;VALUE=DATE:20230103
+DTEND;VALUE=DATE:20230103
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/new-years-day.php to know more about 2nd January (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda992db1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:St. Patrick's Day (NIR)
+DTSTART;VALUE=DATE:20230317
+DTEND;VALUE=DATE:20230317
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/st-patricks-day.php to know more about St. Patrick's Day (NIR). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda993d51697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Good Friday
+DTSTART;VALUE=DATE:20230407
+DTEND;VALUE=DATE:20230407
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/good-friday.php to know more about Good Friday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda994d91697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Sunday
+DTSTART;VALUE=DATE:20230409
+DTEND;VALUE=DATE:20230409
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/easter.php to know more about Easter Sunday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda995cf1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Monday (ENG\, NIR\, WAL)
+DTSTART;VALUE=DATE:20230410
+DTEND;VALUE=DATE:20230410
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/christian/easter-monday.php to know more about Easter Monday (ENG\, NIR\, WAL). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda996ce1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Early May Bank Holiday
+DTSTART;VALUE=DATE:20230501
+DTEND;VALUE=DATE:20230501
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/early-may-bank-holiday.php to know more about Early May Bank Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda997c91697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Bank holiday for the coronation of King Charles III
+DTSTART;VALUE=DATE:20230508
+DTEND;VALUE=DATE:20230508
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays to know more about Bank holiday for the coronation of King Charles III. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda998d61697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Spring Bank Holiday
+DTSTART;VALUE=DATE:20230529
+DTEND;VALUE=DATE:20230529
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/may-spring-bank-holiday.php to know more about Spring Bank Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda999e01697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Battle of the Boyne (NIR)
+DTSTART;VALUE=DATE:20230712
+DTEND;VALUE=DATE:20230712
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/battle-of-the-boyne.php to know more about Battle of the Boyne (NIR). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda99ae01697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Summer Bank Holiday (SCT)
+DTSTART;VALUE=DATE:20230807
+DTEND;VALUE=DATE:20230807
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/summer-bank-holiday.php to know more about Summer Bank Holiday (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda99be71697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Summer Bank Holiday (ENG\, NIR\, WAL)
+DTSTART;VALUE=DATE:20230828
+DTEND;VALUE=DATE:20230828
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/summer-bank-holiday.php to know more about Summer Bank Holiday (ENG\, NIR\, WAL). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda99d021697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Guy Fawkes Day
+DTSTART;VALUE=DATE:20231105
+DTEND;VALUE=DATE:20231105
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/guy-fawkes-day.php to know more about Guy Fawkes Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda99e071697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:St. Andrew's Day (SCT)
+DTSTART;VALUE=DATE:20231130
+DTEND;VALUE=DATE:20231130
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/christian/st-andrews-day.php to know more about St. Andrew's Day (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda99f0f1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Christmas Day
+DTSTART;VALUE=DATE:20231225
+DTEND;VALUE=DATE:20231225
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/christmas.php to know more about Christmas Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a0541697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Boxing Day
+DTSTART;VALUE=DATE:20231226
+DTEND;VALUE=DATE:20231226
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/canada/boxing-day.php to know more about Boxing Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a2561697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:New Year's Day
+DTSTART;VALUE=DATE:20240101
+DTEND;VALUE=DATE:20240101
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/new-years-day.php to know more about New Year's Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a3881697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:2nd January (SCT)
+DTSTART;VALUE=DATE:20240102
+DTEND;VALUE=DATE:20240102
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/new-years-day.php to know more about 2nd January (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a4be1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:St. Patrick's Day (NIR)
+DTSTART;VALUE=DATE:20240317
+DTEND;VALUE=DATE:20240317
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/st-patricks-day.php to know more about St. Patrick's Day (NIR). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a5dc1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:St. Patrick's Day Holiday
+DTSTART;VALUE=DATE:20240318
+DTEND;VALUE=DATE:20240318
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/st-patricks-day.php to know more about St. Patrick's Day Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a6f21697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Good Friday
+DTSTART;VALUE=DATE:20240329
+DTEND;VALUE=DATE:20240329
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/good-friday.php to know more about Good Friday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a8651697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Sunday
+DTSTART;VALUE=DATE:20240331
+DTEND;VALUE=DATE:20240331
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/easter.php to know more about Easter Sunday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9a9811697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Easter Monday (ENG\, NIR\, WAL)
+DTSTART;VALUE=DATE:20240401
+DTEND;VALUE=DATE:20240401
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/christian/easter-monday.php to know more about Easter Monday (ENG\, NIR\, WAL). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9aae11697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Early May Bank Holiday
+DTSTART;VALUE=DATE:20240506
+DTEND;VALUE=DATE:20240506
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/early-may-bank-holiday.php to know more about Early May Bank Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9acee1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Spring Bank Holiday
+DTSTART;VALUE=DATE:20240527
+DTEND;VALUE=DATE:20240527
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/may-spring-bank-holiday.php to know more about Spring Bank Holiday. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9ae1d1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Battle of the Boyne (NIR)
+DTSTART;VALUE=DATE:20240712
+DTEND;VALUE=DATE:20240712
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/battle-of-the-boyne.php to know more about Battle of the Boyne (NIR). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9af431697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Summer Bank Holiday (SCT)
+DTSTART;VALUE=DATE:20240805
+DTEND;VALUE=DATE:20240805
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/summer-bank-holiday.php to know more about Summer Bank Holiday (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b09f1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Summer Bank Holiday (ENG\, NIR\, WAL)
+DTSTART;VALUE=DATE:20240826
+DTEND;VALUE=DATE:20240826
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/summer-bank-holiday.php to know more about Summer Bank Holiday (ENG\, NIR\, WAL). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b2311697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Guy Fawkes Day
+DTSTART;VALUE=DATE:20241105
+DTEND;VALUE=DATE:20241105
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/uk/guy-fawkes-day.php to know more about Guy Fawkes Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b3bb1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:St. Andrew's Day (SCT)
+DTSTART;VALUE=DATE:20241130
+DTEND;VALUE=DATE:20241130
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/christian/st-andrews-day.php to know more about St. Andrew's Day (SCT). \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b5041697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Christmas Day
+DTSTART;VALUE=DATE:20241225
+DTEND;VALUE=DATE:20241225
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/us/christmas.php to know more about Christmas Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b62e1697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:Boxing Day
+DTSTART;VALUE=DATE:20241226
+DTEND;VALUE=DATE:20241226
+LOCATION:United Kingdom
+DESCRIPTION:Visit https://calendarlabs.com/holidays/canada/boxing-day.php to know more about Boxing Day. \n\n Like us on Facebook: http://fb.com/calendarlabs to get updates
+UID:652baeda9b7591697361626@calendarlabs.com
+DTSTAMP:20231015T092026Z
+STATUS:CONFIRMED
+TRANSP:TRANSPARENT
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR
