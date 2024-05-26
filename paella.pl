@@ -12,12 +12,9 @@ my $VERSION=0.06;
 my $dateIndex={};
 my $calendar={};
 
-my $options={showWeek=>1,showYear=>1};
+my $options={showWeek=>1,showYear=>1, mode=>"yearView"};
 
-my @icsFileColours=(["example.ics", "red"],["UK_Holidays.ics","cyan"]);
-foreach (@icsFileColours){
-	loadICS(@$_);
-}
+loadICSDir();
 
 # set of functions work on Dates in the form of a YYYYMMDD string
 # These could be easily replaced with more robust DateTime  or
@@ -225,7 +222,11 @@ sub yearGrid{
 	while ($m<$options->{startMonth}){
 		$options->{startMonth}-=$options->{monthsPerRow};
 	};
-	$options->{startMonth}=1 if $options->{startMonth}<0;
+	if ($options->{startMonth}<0){
+		$options->{startMonth}+=11;
+		$y--;
+		die $options->{startMonth}." ".$y." ".$y.sprintf ("%02d",$options->{startMonth})."01";
+	};
 	while ($m<$options->{startMonth}){
 		$options->{startMonth}-=$options->{monthsPerRow};
 	};
@@ -240,14 +241,26 @@ sub yearGrid{
 	}
 }
 
+sub monthView{
+	clearScreen();
+}
+
 sub updateAction{
-	clearScreen(); yearGrid($options->{current},$options) ;
-	if ($dateIndex->{$options->{current}}){
-		printAt(10*$options->{monthRows}+$options->{rOffset}-2,20,"");
-		my $summaries="";
-		foreach (@{$dateIndex->{$options->{current}}}){$summaries.= paint($_->{name},$_->{format})." "};
-		$summaries =~s/[\r\n]//g;
-		print $summaries;
+	clearScreen();
+	if ($options->{mode} eq 'yearView'){
+		yearGrid($options->{current},$options) ;
+		if ($dateIndex->{$options->{current}}){
+			printAt(10*$options->{monthRows}+$options->{rOffset}-2,20,"");
+			my $summaries="";
+			foreach (@{$dateIndex->{$options->{current}}}){$summaries.= paint($_->{name},$_->{format})." "};
+			$summaries =~s/[\r\n]//g;
+			print $summaries;
+		}
+	}
+	else{		
+	  $options->{border}="shadow";
+	  printAt(3,3,monthGrid($options->{current}));
+		
 	}
 }
 
@@ -279,17 +292,32 @@ my $namedKeys={
 	'[Fm' =>  'end',
 };
 my $keyActions={
-	'home'      =>sub{$options->{current}=$today;},
-	'rightarrow'=>sub{$options->{current}=addDay($options->{current},1);},
-	'leftarrow' =>sub{$options->{current}=subDay($options->{current},1);},
-	'uparrow'   =>sub{$options->{current}=subDay($options->{current},7);},
-	'downarrow' =>sub{$options->{current}=addDay($options->{current},7);},
-	'pagedown'  =>sub{$options->{current}=addMonth($options->{current});},
-	'pageup'    =>sub{$options->{current}=subMonth($options->{current});},
-	'tab'       =>sub{$options->{current}=(substr($options->{current},0,4)+1).substr($options->{current},4,4);},
-	'shifttab'  =>sub{$options->{current}=(substr($options->{current},0,4)-1).substr($options->{current},4,4);},
+	yearView=>{
+		'home'      =>sub{$options->{current}=$today;},
+		'rightarrow'=>sub{$options->{current}=addDay($options->{current},1);},
+		'leftarrow' =>sub{$options->{current}=subDay($options->{current},1);},
+		'uparrow'   =>sub{$options->{current}=subDay($options->{current},7);},
+		'downarrow' =>sub{$options->{current}=addDay($options->{current},7);},
+		'pagedown'  =>sub{$options->{current}=addMonth($options->{current});},
+		'pageup'    =>sub{$options->{current}=subMonth($options->{current});},
+		'tab'       =>sub{$options->{current}=(substr($options->{current},0,4)+1).substr($options->{current},4,4);},
+		'shifttab'  =>sub{$options->{current}=(substr($options->{current},0,4)-1).substr($options->{current},4,4);},
+		'return'    =>sub{$options->{mode}="monthView";monthView()},
+    },
+    monthView=>{
+		'home'      =>sub{$options->{current}=$today;},
+		'rightarrow'=>sub{$options->{current}=addDay($options->{current},1);},
+		'leftarrow' =>sub{$options->{current}=subDay($options->{current},1);},
+		'uparrow'   =>sub{$options->{current}=subDay($options->{current},7);},
+		'downarrow' =>sub{$options->{current}=addDay($options->{current},7);},
+		
+		
+		
+	}
 };
 
+
+# handle terminal window size changes
 $SIG{WINCH} = sub {
     get_terminal_size();
     $update = 1;
@@ -355,9 +383,8 @@ sub dokey {
 sub nameKey{my $nk=$_[1]?$_[1]:$_[0];return $namedKeys->{$nk}//chr($nk);}
 
 sub act{ 
-	$keyActions->{$_[0]}->() if ($keyActions->{$_[0]});
+	$keyActions->{$options->{mode}}->{$_[0]}->() if ($keyActions->{$options->{mode}}->{$_[0]});
 	$update=1;
-	#printAt(0,0,$_[0]."  ");
 }
 
 sub get_esc {
@@ -370,7 +397,21 @@ sub get_esc {
 }
 
 # This is an ultra simplistic ics file importer
-# Populates $calendar and $cdv with dates from an ics file
+# Populates $calendar and $dateitems with events from an ics file
+
+sub loadICSDir{
+	my $dir=shift//(-d "ICS")?"ICS":".";
+	opendir (my $d, $dir) or return;
+	my @cols=qw/red green blue yellow magenta cyan/;
+	while (my $file_name = readdir($d)) {
+		next unless $file_name=~/.ics$/;
+
+		my $col=pop @cols;
+		loadICS($dir."/".$file_name,$col);
+		unshift @cols,$col;
+	}
+	close $d;
+}
 
 sub loadICS{
 	our ($file,$col)=@_;
