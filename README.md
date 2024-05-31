@@ -17,7 +17,7 @@ The objective of `paella.pl` is to create a general purpose calendar application
 ## Key bindings
 
 Two modes of operation currently
-
+```
 Mode 'yearView'
 		'home'      => focus on today's date;
 		'rightarrow'=> move to next day,
@@ -37,6 +37,6 @@ Mode monthView
 		'uparrow'   => move to 1 week before,
 		'downarrow' => move 1 week later,
 		'#'         => change modes,
-
+```
 The month view mode *will* show more information about the focused date
 
