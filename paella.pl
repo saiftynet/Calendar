@@ -4,15 +4,15 @@
 ############################################################################# 
 
 use strict; use warnings;
-my $VERSION=0.06;
+my $VERSION=0.07;
 
 # variables  for the ics file importer
 # Calendar contain events
 # $dateIndex contains events for each day, its name and a colour to apply
-my $dateIndex={};
+my $dateIndex={};  
 my $calendar={};
 
-my $options={showWeek=>1,showYear=>1, mode=>"yearView"};
+my $options={showWeek=>0,showYear=>1, mode=>"yearView"};
 
 loadICSDir();
 
@@ -42,7 +42,7 @@ sub jDt{ return sprintf ("%04d",$_[0]).sprintf ("%02d",$_[1]).sprintf ("%02d",$_
 sub ly{my ($y,$m,$d)=spDt($_[0]);return (($y%4) - ($y%100) + ($y%400))?0:1;};
 # day 1 of year Gregorian Guassian Method ( https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
 sub d1greg{my ($y,$m,$d)=spDt($_[0]	);return (1+5*(($y-1)%4)+4*(($y-1)%100)+6*(($y-1)%400))%7;};
-# day 1 of year Gregorian  Zeller Rule (m=11 for january, k=1 first day,D is substr($_[0],2,2), C=substr($_[0],0,2) ) (wikpedia F=k+ [(13*m-1)/5] +D+ [D/4] +[C/4]-2*C where
+# day 1 of year Gregorian  Zeller
 #sub d1greg{ my $Y=substr($_[0],0,4)-1;my $zeller=  (int(13*14/5) + int(($Y%100)/4) + int((int($Y/100))/4)+ 1 +($Y%100)-2*int($Y/100))%7 ; return ($zeller +6)%7};
 # day 1 of year Gregorian lookup from list 28 year cycle;
 #sub d1greg{ my $Y=substr($_[0],0,4);return (0,2,3,4, 5,0,1,2, 3,5,6,0, 1,3,4,5, 6,1,2,3, 4,6,0,1, 2,4,5,6)[($Y-1996)%28];}
@@ -106,17 +106,16 @@ my %borders=(
 sub border{
 	my ($grid,$style)=@_;;
 	my $height=@$grid;
-	my $width=2;
-	foreach (@$grid){
-		my $w=length stripColours(join("",@$_));
-		$width=$w if $w>$width;
-	}
+	my $width=2;my $w;
 	foreach (0..$#$grid){
 		$grid->[$_]=[$borders{$style}{l},@{$grid->[$_]},$borders{$style}{r}];
+		my $tmp=stripColours(join("",@{$grid->[$_]}));
+		$tmp=~s/│/|/g;
+		$width=length $tmp if length $tmp>$width;
 	};
-	$grid=[[$borders{$style}{tl},($borders{$style}{t}x($width-2)),$borders{$style}{tr}],
+	$grid=[[$borders{$style}{tl},($borders{$style}{t}x($width-6)),$borders{$style}{tr}],
 	        @$grid,
-	        [$borders{$style}{bl},($borders{$style}{b}x($width-2)),$borders{$style}{br}],];
+	        [$borders{$style}{bl},($borders{$style}{b}x($width-6)),$borders{$style}{br}],];
 	return $grid;
 }
 
@@ -169,8 +168,8 @@ sub paintMd{
 	    my $fullDate=substr ($dt,0,6).sprintf("%02d",$date);
 	    if ($fullDate eq $today) {push @decorations,"underline";};
 	    if ($fullDate eq $options->{current}){push @decorations,"blink invert";};
-	    if ($dateIndex->{$fullDate}) {push @decorations,$dateIndex->{$fullDate}->[0]->{format}};
-		}
+	    if ($dateIndex->{$fullDate}->{events}->[0]) {push @decorations,$dateIndex->{$fullDate}->{events}->[0]->{format}};
+	}
 	$painted=paint($date,join(" ",@decorations));
 
 	return " "x(3-length $date).$painted;#paint($date,$dt,$options);
@@ -185,8 +184,8 @@ sub center{  # a 3 character positioned in middle of other 3 character blocks
 	return [("   ")x$pre, @split,("   ")x$post];
 }
 
-# Creating grids for month view
 
+# Creating grids for month view
 sub monthGrid{
 	my ($dt)=@_;
 	my ($y,$m,$d)=spDt($dt);
@@ -222,47 +221,28 @@ sub yearGrid{
 	while ($m<$options->{startMonth}){
 		$options->{startMonth}-=$options->{monthsPerRow};
 	};
-	if ($options->{startMonth}<0){
-		$options->{startMonth}+=11;
-		$y--;
-		die $options->{startMonth}." ".$y." ".$y.sprintf ("%02d",$options->{startMonth})."01";
-	};
 	while ($m<$options->{startMonth}){
 		$options->{startMonth}-=$options->{monthsPerRow};
 	};
+	# an error occurs somethimes when calendar is resized, when the
+	# months from the previous year need to be displayed
+	if ($options->{startMonth}<0){ 
+		$options->{startMonth}+=11;
+		$y--;
+		#die $options->{startMonth}." ".$y." ".$y.sprintf ("%02d",$options->{startMonth})."01";
+	};
 	my $month=$options->{startMonth};	
+	my $calWidth=23+3*$options->{showWeek};
 	foreach my $row (1..$options->{monthRows}){
 		foreach my $col(1..$options->{monthsPerRow}){
 			$options->{border}=($month == $m)?"double":"none";
-			printAt (($row-1)*10+$options->{rOffset},($col-1)*26+$options->{cOffset},monthGrid($y.sprintf ("%02d",$month)."01",$options));
+			printAt (($row-1)*10+$options->{rOffset},($col-1)*$calWidth+$options->{cOffset},monthGrid($y.sprintf ("%02d",$month)."01",$options));
 			$month++;
 			if ($month>12){$month=1;$y++}
 		}
 	}
 }
 
-sub monthView{
-	clearScreen();
-}
-
-sub updateAction{
-	clearScreen();
-	if ($options->{mode} eq 'yearView'){
-		yearGrid($options->{current},$options) ;
-		if ($dateIndex->{$options->{current}}){
-			printAt(10*$options->{monthRows}+$options->{rOffset}-2,20,"");
-			my $summaries="";
-			foreach (@{$dateIndex->{$options->{current}}}){$summaries.= paint($_->{name},$_->{format})." "};
-			$summaries =~s/[\r\n]//g;
-			print $summaries;
-		}
-	}
-	else{		
-	  $options->{border}="shadow";
-	  printAt(3,3,monthGrid($options->{current}));
-		
-	}
-}
 
 # interactivity
 # shamelessly stolen from ped  by nieka@daansystems.com
@@ -274,6 +254,26 @@ $_ = '' for my (
     $stty,
 );
 $update=1;
+
+
+sub updateAction{
+	clearScreen();
+	if ($options->{mode} eq 'yearView'){
+		yearGrid($options->{current},$options) ;
+		if ($dateIndex->{$options->{current}}){
+			printAt(10*$options->{monthRows}+$options->{rOffset}-2,20,"");
+			my $summaries="";
+			foreach (@{$dateIndex->{$options->{current}}->{events}}){$summaries.= paint($calendar->{events}->[$_->{index}]->{SUMMARY},$_->{format})." "};
+			print $summaries;
+		}
+	}
+	else{		
+	  $options->{border}="shadow";
+	  printAt(3,3,monthGrid($options->{current}));
+	}
+}
+
+
 my $namedKeys={
 	32    =>  'space',
 	13    =>  'return',
@@ -302,7 +302,7 @@ my $keyActions={
 		'pageup'    =>sub{$options->{current}=subMonth($options->{current});},
 		'tab'       =>sub{$options->{current}=(substr($options->{current},0,4)+1).substr($options->{current},4,4);},
 		'shifttab'  =>sub{$options->{current}=(substr($options->{current},0,4)-1).substr($options->{current},4,4);},
-		'return'    =>sub{$options->{mode}="monthView";monthView()},
+		'#'         =>sub{$options->{mode}="monthView";updateAction()},
     },
     monthView=>{
 		'home'      =>sub{$options->{current}=$today;},
@@ -310,9 +310,7 @@ my $keyActions={
 		'leftarrow' =>sub{$options->{current}=subDay($options->{current},1);},
 		'uparrow'   =>sub{$options->{current}=subDay($options->{current},7);},
 		'downarrow' =>sub{$options->{current}=addDay($options->{current},7);},
-		
-		
-		
+		'#'         =>sub{$options->{mode}="yearView";updateAction()},
 	}
 };
 
@@ -324,7 +322,6 @@ $SIG{WINCH} = sub {
 	updateAction();
 };
 
-run();
 
 sub get_terminal_size {
     ( $windowHeight, $windowWidth ) = split( /\s+/, `stty size` );
@@ -334,7 +331,8 @@ sub get_terminal_size {
 	$options->{monthsPerRow} =  4 if ($options->{monthsPerRow} ==5);
 	$options->{monthRows}   =  int($windowHeight/10);
 	$options->{monthRows}-- while ($options->{monthsPerRow}*$options->{monthRows}>12);
-	$options->{cOffset}      =  int(($windowWidth- $options->{monthsPerRow}*26)/2);
+	my $calWidth=23+3*$options->{showWeek};
+	$options->{cOffset}      =  int(($windowWidth- $options->{monthsPerRow}*$calWidth)/2);
 	$options->{rOffset}      =  int(($windowHeight- $options->{monthRows}*10)/2)+2;
 }
 
@@ -356,6 +354,7 @@ sub ReadMode {
 
 sub run {
     get_terminal_size();
+    splash();
     binmode(STDIN);
     ReadMode(5);
     my $key;
@@ -374,17 +373,26 @@ sub dokey {
     return 1 unless $key;
     my $ctrl = ord($key);my $esc="";
     return if ($ctrl == 3);                 # Ctrl+c = exit;
+    my $pressed="";
     $esc = get_esc() if ($ctrl==27);
-    act(nameKey($ctrl,$esc));    
+    if (exists $namedKeys->{$ctrl}){$pressed=$namedKeys->{$ctrl}}
+	elsif (exists $namedKeys->{$esc}){$pressed=$namedKeys->{$esc}}
+	else{$pressed= ($esc ne "")?$esc:chr($ctrl);};
+    act($pressed);    
     return 1;
 }
 
-#convert key codes to named key
-sub nameKey{my $nk=$_[1]?$_[1]:$_[0];return $namedKeys->{$nk}//chr($nk);}
-
 sub act{ 
-	$keyActions->{$options->{mode}}->{$_[0]}->() if ($keyActions->{$options->{mode}}->{$_[0]});
+	my $key=shift;
+	if ($keyActions->{$options->{mode}}->{$key}){
+		$keyActions->{$options->{mode}}->{$key}->();
+	}
+	else{
+		$options->{buffer}//="";
+		$options->{buffer}.=$key;
+	} 
 	$update=1;
+	
 }
 
 sub get_esc {
@@ -416,12 +424,12 @@ sub loadICSDir{
 sub loadICS{
 	our ($file,$col)=@_;
 	open my $ics,"<",$file;
-	$calendar//={events=>[],};
+	$calendar//={events=>[],todos=>[],journals=>[]};
 	our @levels;
 	my $lastLine="";
 	our $item={};
 	while  (my $line=<$ics>){
-	   chomp $line;
+	   $line =~s/[\r\n]//g;
 	   if($lastLine eq ""){
 		   $lastLine = $line;
 	   }
@@ -433,6 +441,8 @@ sub loadICS{
 			$lastLine=$line;
 		}
 	}
+	
+	close $ics;
 	sub parseLine{
 		my $line=shift;
 		 if ($line=~/^BEGIN:V(.*)$/){
@@ -440,19 +450,17 @@ sub loadICS{
 			 return;
 		 }
 		 elsif ($line=~/^END:V(.*)$/){                          # end of section 
-			 if ($levels[-1]=~/EVENT/){
+			 if ($levels[-1]=~/(EVENT|TODO|JOURNAL)/){
+				 my $class=lc $1."s";
 				if (%$item){
-					push @{$calendar->{events}},{%$item} if %$item;
-					$dateIndex->{substr ($item->{DTSTART},0,8)}//=[];
-					$dateIndex->{substr ($item->{DTSTART},0,8)}=[{
-						name     =>$item->{SUMMARY},
-						format   =>$col,},@{$dateIndex->{substr ($item->{DTSTART},0,8)}},];
+					push @{$calendar->{$class}},{%$item} if %$item;
+					addDateItem($class,$item,$col);
 				}
 				$item={};
 			}
 			pop @levels;
 		}
-		elsif ($levels[-1]=~/EVENT/){
+		elsif ($levels[-1]=~/EVENT|TODO|JOURNAL/){
 			my @parts=($line=~/^([A-Z\-]+)(\;[^\;\:]+)?(\:.*)$/);
 			$item->{$parts[0]}=substr $parts[-1],1 if $parts[0];
 		}
@@ -460,13 +468,51 @@ sub loadICS{
 			my @parts=($line=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
 			$calendar->{$parts[0]}=substr $parts[-1],1 if $parts[0];
 		}
-		else{
+		else{ #for subcomponents e.g. alarm
 			$item->{$levels[-1]}//={};
 			my @parts=($line=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
 			$item->{$levels[-1]}->{$parts[0]}=substr $parts[-1],1 if $parts[0];
 		}
 	}
-	close $ics;
+	
+	sub addDateItem{
+		my ($class,$itm,$clr)=@_;
+		my $dateStr=substr ($item->{DTSTART},0,8);
+		$dateIndex->{$dateStr}//={events=>[],todos=>[],journal=>[],};
+		$dateIndex->{$dateStr}->{$class}=[{index  => $#{$calendar->{$class}},
+			                               format => $clr},
+			                               @{$dateIndex->{$dateStr}->{$class}},];
+	}
 }
+
+
+sub splash{
+	clearScreen();
+	my @splash=qw/
+██████╗░░█████╗░███████╗██╗░░░░░██╗░░░░░░█████╗░
+██╔══██╗██╔══██╗██╔════╝██║░░░░░██║░░░░░██╔══██╗
+██╔══██╗██╔══██╗██╔════╝██║░░░░░██║░░░░░██╔══██╗
+██████╔╝███████║█████╗░░██║░░░░░██║░░░░░███████║
+██╔═══╝░██╔══██║██╔══╝░░██║░░░░░██║░░░░░██╔══██║
+██╔═══╝░██╔══██║██╔══╝░░██║░░░░░██║░░░░░██╔══██║
+██║░░░░░██║░░██║███████╗███████╗███████╗██║░░██║
+╚═╝░░░░░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝╚═╝░░╚═╝
+T_h_e__P_e_r_l__S_u_p_e_r_C_a_l_e_n_d_a_r__A_p_p
+
+/;
+
+foreach my $step (0..$windowWidth/2+30){
+	foreach (0..$#splash){
+		printAt($windowHeight/2-3+$_,$windowWidth-$step,substr($splash[$_],0,3*$step)."   ");
+		$step++ unless ($windowWidth/2+30-$step)<=0;
+	}
+	printAt($windowHeight/2+6,0,"                                     ");
+
+	select(undef, undef, undef, 0.01);
+}
+sleep 1;
+}
+
+run();
 
 ;
