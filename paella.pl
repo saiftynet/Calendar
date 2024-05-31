@@ -268,7 +268,7 @@ sub updateAction{
 		}
 	}
 	else{		
-	  $options->{border}="shadow";
+	  $options->{border}="double";
 	  printAt(3,3,monthGrid($options->{current}));
 	}
 }
