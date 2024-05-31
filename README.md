@@ -10,5 +10,33 @@ The objective of `paella.pl` is to create a general purpose calendar application
 * Create iCAL files (TODO)
 * Year views and month views (TODO)
 
+## Usage
 
+`paella.pl` - runs the application with default parameters, loads ics files from a folder called ICS if one exists, or from current directory if one doesn't;
+
+## Key bindings
+
+Two modes of operation currently
+
+Mode 'yearView'
+		'home'      => focus on today's date;
+		'rightarrow'=> move to next day,
+		'leftarrow' => move to previous day,
+		'uparrow'   => move to 1 week before,
+		'downarrow' => move 1 week later,
+		'pagedown'  => move one month later,
+		'pageup'    => move back one month,
+		'tab'       => move forward one year,
+		'shifttab'  => mov back one year,
+		'#'         => change modes,
+  
+Mode monthView
+		'home'      => focus on today's date;
+		'rightarrow'=> move to next day,
+		'leftarrow' => move to previous day,
+		'uparrow'   => move to 1 week before,
+		'downarrow' => move 1 week later,
+		'#'         => change modes,
+
+The month view mode *will* show more information about the focused date
 
