@@ -191,7 +191,7 @@ sub monthGrid{
 	my ($y,$m,$d)=spDt($dt);
 	$options->{border}//="thin";
 	
-	my @paddedMonth=((" ")x(d1m($dt)),(1..dim($dt)) );
+	my @paddedMonth=((" ")x((d1m($dt)+6)%7),(1..dim($dt)) );
 	@paddedMonth=(@paddedMonth,(" ")x(6-($#paddedMonth%7)));
 	my $grid=[];
 	foreach my $row (0..(@paddedMonth/7-1)){
