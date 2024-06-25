@@ -1,3 +1,10 @@
+### Version 0.09
+* Complete re-write as u/ovidperl and u/fellowsnaketeaser suggested previously
+* More object orientated but still pretty much monolithic.
+* Adds Month view of views with corresponding set of key actions
+* protype rrule parser started
+
+
 ### Version 0.07
 * Adds a splash routine
 * Adds modes of views with corresponding set of key actions
