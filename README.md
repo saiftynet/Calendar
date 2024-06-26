@@ -14,6 +14,10 @@ The objective of `paella.pl` is to create a general purpose calendar application
 * Create iCAL files (TODO)
 * Year views and month views (TODO)
 
+![image](https://github.com/saiftynet/Calendar/assets/34284663/45873295-be5f-4c3e-9a55-6d37006ec7a0)
+
+
+
 ## Usage
 
 `paella.pl` - runs the application with default parameters, loads ics files from a folder called ICS if one exists, or from current directory if one doesn't;
