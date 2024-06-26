@@ -12,7 +12,8 @@ The objective of `paella.pl` is to create a general purpose calendar application
 * Interactive calendar  (done in version 0.04)
 * Responsive to screensize changes
 * Create iCAL files (TODO)
-* Year views and month views (TODO)
+* Year views and month views  (done in version 0.09)
+* Handle RRULES EXDATES and RDATES (started in version 0.09)
 
 ![image](https://github.com/saiftynet/Calendar/assets/34284663/45873295-be5f-4c3e-9a55-6d37006ec7a0)
 
@@ -28,6 +29,7 @@ Two modes of operation currently
 ```
 Mode 'yearView'
 		'home'      => focus on today's date;
+		't'         => focus on today's date;
 		'rightarrow'=> move to next day,
 		'leftarrow' => move to previous day,
 		'uparrow'   => move to 1 week before,
