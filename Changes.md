@@ -1,5 +1,5 @@
 ### Version 0.09
-* Complete re-write as u/ovidperl and u/fellowsnaketeaser suggested previously
+* Complete re-write as [u/ovidperl and u/fellowsnaketeaser]( https://www.reddit.com/r/perl/comments/1d552hj/paella_an_interactive_calendar_application_for/?rdt=50673) suggested on reddit
 * More object orientated but still pretty much monolithic.
 * Adds Month view of views with corresponding set of key actions
 * protype rrule parser started
