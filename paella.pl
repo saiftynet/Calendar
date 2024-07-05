@@ -9,17 +9,38 @@
 #############################################################################
 
 use strict;use warnings;
-my $VERSION=0.09;
+my $VERSION=0.10;
 
-my $paella=new Paella({dir=>"ICS"});
+my $ics=<<ICSFILE;
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PAELLA//TestObject//EN
+BEGIN:VEVENT
+SUMMARY:Test RRULE
+UID:ff808181-1fd7389e-011f-d7389ef9-00000003
+DTSTART;TZID=America/New_York:20240420T120000
+DURATION:PT1H
+LOCATION:Mo's bar - back room
+RRULE:FREQ=DAILY;UNTIL=20240505;INTERVAL=2
+EXDATE;TZID=America/New_York:20240427T120000,20240428T120000,
+BEGIN:VALARM
+TRIGGER:-PT10M
+ACTION:DISPLAY
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+ICSFILE
 
+my $date=new YMD();
+
+my $paella=new Paella({data=>$ics,dir=>"ICS",splash=>0});
+Draw::clearScreen();
 $paella->run;
 
 ##########################################################################
 ##################  The Application ######################################
 ##########################################################################
 package Paella;
-use Data::Dumper;
 our @weekdays=qw/Monday Tuesday Wednesday Thursday Friday Saturday Sunday/;
 sub new{
     my ($class,$options)=@_;
@@ -27,6 +48,7 @@ sub new{
         mode=>$options->{mode}//"yearView",
         showWeek=>$options->{showWeek}//1,
         showYear=>$options->{showYear}//1,
+        splash=>$options->{splash}//1,
     };
     $self->{current}=YMD->new($options->{date});
     $self->{ui} = new UI;
@@ -35,6 +57,7 @@ sub new{
     
     $self->{calData}->loadDir($options->{dir}) if $options->{dir};
     $self->{calData}->load($options->{file}  ) if $options->{file};
+    $self->{calData}->load($options->{data}  ) if $options->{data};
     bless $self, $class;
     $self->setYearViewSizes();
     $self->setupActions();
@@ -73,6 +96,7 @@ sub setupActions{
         },
         monthView=>{
             'home'      =>sub{$self->{current}=YMD::today();},
+            't   '      =>sub{$self->{current}=YMD::today();},
             'rightarrow'=>sub{$self->{current}=YMD::addDay($self->{current},1);},
             'leftarrow' =>sub{$self->{current}=YMD::subDay($self->{current},1);},
             'uparrow'   =>sub{$self->{current}=YMD::subDay($self->{current},7);},
@@ -93,9 +117,10 @@ sub setupActions{
 
 sub run{
     my $self=shift;
-    $self->{d}->splash();
+    $self->{d}->splash() if $self->{splash};
     $self->updateAction();
     $self->{ui}->run("yearView");
+    exit;
 }
 
 sub updateAction{
@@ -175,7 +200,7 @@ sub monthView{
     my ($self,$date)=@_;
     my $columnWidth=int($self->{ui}->{windowWidth}/7);
     my $rOffset=($self->{ui}->{windowWidth}-$columnWidth*7);
-    my $rowHeight=3;
+    my $rowHeight=$self->{ui}->{windowHeight}/7;
     my $monthGrid=$date->monthGrid();    
     
     # build cnontents for each cell
@@ -249,18 +274,18 @@ package CalData;
 ###########################################################################
 ################# Calendar Data Consolidation Object ######################
 ###########################################################################
-
 # This package parses data from ics files and stores and indexes them.
 # It will handle Repeat Rules,EXDATES and RDATES (incomplete)
+
     sub new{
-        my ($class,$calendar,$data,$col,$emoji)=@_;
+        my ($class,$data)=@_;
         my $self={ calendar=>{events=>[],todos=>[],journals=>[],},
                    dateIndex=>{},
                    lastLine=>"",
                    item=>{},
                    levels=>[],
-                   col=>$col//"red",
-                   emoji=>$emoji//""};
+                   col=>[qw/red green yellow magenta cyan/],
+                   emoji=>""};
         bless $self,$class;
         $self->load($data) if $data;
         return $self;
@@ -270,24 +295,37 @@ package CalData;
         my ($self,$dir)=@_;
         $dir//="./";
         opendir (my $d, $dir) or return;
-        my @cols=qw/red green yellow magenta cyan/; # blue black and white reserved
         while (my $file_name = readdir($d)) {
            next unless $file_name=~/.ics$/;
-           my $col=pop @cols;
-           $self->{col}=$col;
            $self->load($dir."/".$file_name);
-           unshift @cols,$col;
         }
         close $d;
     }
     
-    
     sub load{  # load data line by line
         my ($self,$file)=@_;
-        open my $ics,"<",$file or return;
-        $self->{lastLine}="";
-        while  (my $line=<$ics>){
-            $line =~s/[\r\n]//g;
+        $self->{col}=[@{$self->{col}}[1..$#{$self->{col}}],$self->{col}->[0]];
+        if (length $file > 100){
+			while($file =~ /([^\n]+)\n?/g){
+				$self->nextLine($1);
+			}
+		}
+        elsif (-e $file and !-d $file){ # if a filepath passed read file and parse it line by line;
+			open my $ics,"<",$file or return;
+			$self->{lastLine}="";
+			while  (my $line=<$ics>){
+				$self->nextLine($line)
+			}
+			close $ics;
+		}
+		elsif (-d $file){
+			loadDir($self,$file);
+		}
+    }
+    
+    sub nextLine{ # data is read line by line, from files or strings
+        my ($self,$line)=@_;
+		   $line =~s/[\r\n]//g;
            if($self->{lastLine} eq ""){
                $self->{lastLine} = $line;
            }
@@ -298,8 +336,13 @@ package CalData;
                 $self->parseLine();
                 $self->{lastLine}=$line;
             }
-        }
     }
+
+    sub getEvents{
+		my ($self,$date) = @_;
+		$date=$date->toStr() if ref $date;
+		return $self->{dateIndex}{$date}{events}		
+	}
     
     sub parseLine{
         my $self=shift;
@@ -350,10 +393,9 @@ package CalData;
             $rrule->{$key}=$value;
         }
         $rrule->{INTERVAL}//=1;
-        $rrule->{COUNT}//=1;
         
-        my ($step,$fun)=(1,"YMD::addDay");
-        my $count=$rrule->{COUNT};
+        my ($step,$fun)=(1,"addDay");
+        
         if ($rrule->{FREQ}){
             for($rrule->{FREQ}){
                 /DAILY/ && do{
@@ -366,26 +408,41 @@ package CalData;
                 };
                 /MONTHLY/ && do{
                     $step=$rrule->{INTERVAL};
-                    $fun="YMD::addMonth";
+                    $fun="addMonth";
                     last;
                 };
             }
+			# do the repeats
+			if ($rrule->{COUNT}){
+				my $count=$rrule->{COUNT};
+				while ($count>0){
+						$self->addDateItem($type,$date->toStr());
+						$date=$date->$fun($step);
+						$count--;
+				}
+			}
+			elsif ($rrule->{UNTIL}){
+				while ($date->cmp($rrule->{UNTIL})<=0){
+						$self->addDateItem($type,$date->toStr());
+						$date=$date->$fun($step);
+				}
+				
+			}            
         }
-        # do the repeats
-        while ($count>0){
-                no strict 'refs';
-                $date=&$fun($date,$step);
-                $self->addDateItem($type,$date->toStr());
-                $count--;
-        }
+
     }
     
     sub addDateItem{
-        my ($self,$type,$date)=@_;
-        $self->{dateIndex}->{$date}//={events=>[],todos=>[],journal=>[],};
-        $self->{dateIndex}->{$date}->{$type}=[{index  => $#{$self->{calendar}->{$type}},
-                                           format => $self->{col}},
-                                           @{$self->{dateIndex}->{$date}->{$type}},];
+        my ($self,$type,$date)=@_;# $date can be a string or YMD object
+        $date = YMD->new($date);
+		my $dateStr=$date->toStr();
+        # item is the last one to be indexed
+        my $item=(@{$self->{calendar}->{$type}})[-1];
+        return if $date->inList($item->{EXDATE});
+        $self->{dateIndex}->{$dateStr}//={events=>[],todos=>[],journal=>[],};
+        $self->{dateIndex}->{$dateStr}->{$type}=[{index  => $#{$self->{calendar}->{$type}},
+                                           format => $self->{col}->[0]},
+                                           @{$self->{dateIndex}->{$dateStr}->{$type}},];
     }
 
 package YMD;
@@ -395,7 +452,7 @@ package YMD;
 # This allows date calculations and calendar drawing
     our @wdn=(qw/Monday Tuesday Wednesday Thursday Friday Saturday Sunday/);
     sub new{
-        my ($class,$str,$m,$d)=@_;
+        my ($class,$str,$m,$d, $H,$M,$S)=@_;
         my $self={};
         if (!$str){ # if nothing passed, then today
             (undef,undef,undef,$self->{d},$self->{m},$self->{y}) = localtime;
@@ -405,8 +462,14 @@ package YMD;
         elsif (ref $str && $str->{y}){ #if a YMD passed, return a clone of it
             ($self->{y},$self->{m},$self->{d})=($str->{y},$str->{m},$str->{d})
         }
-        elsif ($str=~/^\d{8}/){  # if a dateString Passed
+        elsif ($str=~/^\d{8}(T\d{6})?/){  # if a dateString Passed
+			my $t=$1;
             ($self->{y},$self->{m},$self->{d})=($str=~/^(\d{4})(\d{2})(\d{2})/);
+            if ($t){
+				die $t;
+				($self->{H},$self->{M},$self->{S})=($t=~/(\d{2})(\d{2})(\d{2})/);
+				die $self->{H};
+			}
         }
         else {  # if passed with y,m,d 
             ($self->{y},$self->{m},$self->{d})=($str,$m,$d);
@@ -427,53 +490,72 @@ package YMD;
         }
         return sprintf ("%04d",$self->{y}).sprintf ("%02d",$self->{m}).sprintf ("%02d",$self->{d})
     }
-    
+
     sub leapYear{
         my $self=shift;
         my $y=ref $self?$self->{y}:$self;
         return (($y%4) - ($y%100) + ($y%400))?0:1;
     }
+    
+
+# day 1 of year Gregorian Guassian Method ( https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
     sub d1greg{
         my $self=shift;
         return (1+5*(($self->{y}-1)%4)+4*(($self->{y}-1)%100)+6*(($self->{y}-1)%400))%7;
     }
     
+# calculate which day of the year a date falls in    
     sub dayOfYear{
         my $self=shift;
         return $self->{d}+                             # which day
                (0,31,59,90,120,151,181,212,243,273,304,334)[$self->{m}-1]+ # which month
                ((leapYear($self->{y})&&($self->{m}>2))?1:0); # leap year compensation
     }
+    
+# calculate which week of the year a date falls in  
     sub weekOfYear{
         my $self=shift;
         return int((dayOfYear($self)+6)/7);
     }
+
+# calculate which week of the year a date falls in  0..6 with 0 being Sunday    
     sub weekday{
         my $self=shift;
         return (dayOfYear($self)+d1greg($self)-1)%7;
     }
+# calculate which day first day of month is    
     sub monthFirstDay{
         my $self=shift;
         return weekday(YMD->new($self->{y},$self->{m},1));
     }
+    
+# return the number of days in the month (month is 1..12   
     sub daysInMonth{
         my $self=shift;
         return (($self->{m}==2)&&leapYear($self->{y}))?29:(31,28,31,30,31,30,31,31,30,31,30,31)[$self->{m}-1];
     }
+
+# return the name of the day
     sub dayName{
         my $self=shift;
-        return (@wdn)[weekday($self)-1]
+        return (qw/Monday Tuesday Wednesday Thursday Friday Saturday Sunday/)[weekday($self)-1]
     }
+    
+# set the date to a certain date ....does not check for invalida date
     sub setDate{
         my ($self,$date)=@_;
         my $tmp=new YMD($self);
         $tmp->{d}=$date;
         return $tmp;
     }
+
+# return name of month
     sub monthName{
         my $self=shift;
         return (qw/January February March April May June July August September October November December/)[$self->{m}-1]
     }
+    
+    
     sub addDay{
         my ($self,$days)=@_;
         my $tmp=new("YMD",$self);
@@ -524,18 +606,49 @@ package YMD;
         $tmp->{d}=$tmp->{d}<daysInMonth($tmp)?$tmp->{d}:daysInMonth($tmp);
         return $tmp;
     }
-
+    
+   # get the next date with dayname e.g the next("sunday"), next("TU"), next(2);
+    sub next{  
+        my ($self,$day)=@_;
+        if ($day=~/^(su|mo|tu|we|th|fr|sa)/i){
+			$day={su=>0,mo=>1,tu=>2,we=>3,th=>4,fr=>5,sa=>6}->{lc $1}
+		}
+		return undef unless($day>=0 && $day<7);
+        my $tmp=new("YMD",$self);
+        my $tDay=weekday($tmp);
+		$tmp=$tmp->addDay($day-$tDay+($day<=$tDay?7:0));
+		return $tmp;
+	}
+	
+	sub inList{
+        my ($self,@list)=@_;
+        @list=map{substr($_,0,8)} map{split "," } @list;
+        foreach (@list){
+			return 1 if $self->toStr() eq $_
+		}
+        return 0;
+	}
+	
+	# compares two dates, or a another date to itself;
     sub cmp{
         my ($self,$date1,$date2)=@_;
-        $date2=new("YMD",$date2//$date1);
-        $date1=new("YMD",$date2?$date1:$self);
-        return 0  if ($date1->{y}==$date2->{y})&&($date1->{m}==$date2->{m})&&($date1->{d}==$date2->{d});
+        if ($date2){
+			$date2=new("YMD",$date2);
+			$date1=new("YMD",$date1);
+		}
+		else{
+			$date2=new("YMD",$date1);
+			$date1=new("YMD",$self);
+		};
+        
+        #return 0  if ($date1->{y}==$date2->{y})&&($date1->{m}==$date2->{m})&&($date1->{d}==$date2->{d});
         return 1  if ($date1->{y}>$date2->{y});
         return -1 if ($date1->{y}<$date2->{y});
         return 1  if ($date1->{m}>$date2->{m});
         return -1 if ($date1->{m}<$date2->{m});
         return 1 if ($date1->{d}>$date2->{d});
-        return -1;        
+        return -1 if ($date1->{d}<$date2->{d});    
+        return 0;    
     }
     
     # takes a date in YMD, 8 digit string or y,m,d forms
@@ -664,7 +777,7 @@ sub act{
         $self->{buffer}//="";
         $self->{buffer}.=$key;
     } 
-    # $self->stop() if ($pressed eq "Q");
+    $self->stop() if ($pressed eq "Q");
     print $pressed;
     $self->{update}=1;
     
