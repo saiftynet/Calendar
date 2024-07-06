@@ -2,7 +2,7 @@
 
 The objective of `paella.pl` is to create a general purpose calendar application in Pure Perl for the terminal. [Blog introducing this project](https://blogs.perl.org/users/saif/2024/05/making-a-super-cal-if-rage-will-stick-ex-paella-down-us.html) and the reason why it is called Paella.  (There are more capable calendar applications, so didnt want to be pretentious and call it "Super-Cal")  This is a monolithic application, i.e one that is standalone without any dependencies. It has  slimmed down versions of DateTime (to work only on YYYYMMDD format dates), Term::ANSIColor, and Term::ReadKey, all built into this single file applicaton.  A version may be made using above dependencies if felt necessary.
 
-[calendar-(2).webm](https://github.com/saiftynet/Calendar/assets/34284663/d152e2b5-2a30-493e-bfe3-f12d2debaee1)
+![calendar-(2)](https://github.com/saiftynet/Calendar/assets/34284663/536154ca-fbb2-40de-ad28-8f88c20a575c)
 
 
 * Minimal dependencies
