@@ -42,6 +42,7 @@ Mode 'yearView'
 		'tab'       => move forward one year,
 		'shifttab'  => mov back one year,
 		'#'         => change modes,
+		'Q'         => Quits applicatiom,
   
 Mode monthView
 		'home'      => focus on today's date;
@@ -51,6 +52,7 @@ Mode monthView
 		'uparrow'   => move to 1 week before,
 		'downarrow' => move 1 week later,
 		'#'         => change modes,
+		'Q'         => Quits applicatiom,
 ```
 The month view mode *will* show more information about the focused date
 
