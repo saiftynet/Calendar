@@ -17,10 +17,16 @@ The objective of `paella.pl` is to create a general purpose calendar application
   Currently only deals with DAILY, MONTHLY and YEARLY, INTERVAL and COUNT, parameters
   EXDATES handled
   RDATES;PERIOD= ignored as I dont get it
+* Integrated help pages (TODO)
+* Week and Day views (TODO)
 * Create iCAL files (TODO)
 
-![image](https://github.com/saiftynet/Calendar/assets/34284663/45873295-be5f-4c3e-9a55-6d37006ec7a0)
+#### Year View
+![image](https://github.com/saiftynet/Calendar/assets/34284663/4b157754-3318-4667-84d4-572633940eac)
 
+
+#### Month View
+![image](https://github.com/saiftynet/Calendar/assets/34284663/486a842e-7513-4d1b-849e-5075c062f396)
 
 ## Usage
 
