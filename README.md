@@ -11,17 +11,20 @@ The objective of `paella.pl` is to create a general purpose calendar application
 * Import ICS files and appropriate highlighting (done in version 0,05)
 * Interactive calendar  (done in version 0.04)
 * Responsive to screensize changes
-* Create iCAL files (TODO)
 * Year views and month views  (done in version 0.09)
 * Handle RRULES EXDATES and RDATES (started in version 0.09)
+  Paella is not fine grained enough to handle Time...just dates
+  Currently only deals with DAILY, MONTHLY and YEARLY, INTERVAL and COUNT, parameters
+  EXDATES handled
+  RDATES;PERIOD= ignored as I dont get it
+* Create iCAL files (TODO)
 
 ![image](https://github.com/saiftynet/Calendar/assets/34284663/45873295-be5f-4c3e-9a55-6d37006ec7a0)
 
 
-
 ## Usage
 
-`paella.pl` - runs the application with default parameters, loads ics files from a folder called ICS if one exists, or from current directory if one doesn't;
+`paella.pl` - runs the application with default parameters, loads ics files from a folder called ICS if one exists;
 
 ## Key bindings
 
@@ -42,6 +45,7 @@ Mode 'yearView'
   
 Mode monthView
 		'home'      => focus on today's date;
+		't'         => focus on today's date;
 		'rightarrow'=> move to next day,
 		'leftarrow' => move to previous day,
 		'uparrow'   => move to 1 week before,
