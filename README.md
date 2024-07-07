@@ -65,7 +65,7 @@ The month view mode *will* show more information about the focused date
 
 ### Blog Trail
 
-The evolution of Paella is punctuating blogs at various points in its history.
+The evolution of Paella is punctuated by blogs at various points in its history.
 
 1) [Making a Super Cal if Rage Will Stick Ex Paella Down Us](https://blogs.perl.org/users/saif/2024/05/making-a-super-cal-if-rage-will-stick-ex-paella-down-us.html)
 2) [Making time to waste.](https://blogs.perl.org/users/saif/2024/06/making-time-to-waste.html)
