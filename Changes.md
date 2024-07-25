@@ -1,3 +1,8 @@
+### Version 0.11
+* RRule handling pulled out into separate package  Functionality not changed, but now experimenting with RRule parsing without creating very large lists and then filtering as the norm.
+* RRule object now create a cache of dates, which it passes back to CalData object for adding to the date index.
+* It works differently from other RRule parsers in that it separates algorithms for different available parameter combinations. so each combination that can be handled is added; this may allow future consolidation as I learn commonalities beween each combination.
+
 ### Version 0.09
 * Complete re-write as [u/ovidperl and u/fellowsnaketeaser]( https://www.reddit.com/r/perl/comments/1d552hj/paella_an_interactive_calendar_application_for/?rdt=50673) suggested on reddit
 * More object orientated but still pretty much monolithic.
