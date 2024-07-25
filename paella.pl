@@ -9,7 +9,9 @@
 #############################################################################
 
 use strict;use warnings;
-my $VERSION=0.10;
+my $VERSION=0.11;
+
+# this is a test ICS file  fo testing  purposes.
 
 my $ics=<<ICSFILE;
 BEGIN:VCALENDAR
@@ -20,8 +22,9 @@ SUMMARY:Test RRULE
 UID:ff808181-1fd7389e-011f-d7389ef9-00000003
 DTSTART;TZID=America/New_York:20240420T120000
 DURATION:PT1H
-LOCATION:Mo's bar - back room
-RRULE:FREQ=DAILY;UNTIL=20240505;INTERVAL=2
+LOCATION:TPRF Conference Room
+RDATE:20240714T123000Z,20240107
+RRULE:FREQ=DAILY;COUNT=10;INTERVAL=2
 EXDATE;TZID=America/New_York:20240427T120000,20240428T120000,
 BEGIN:VALARM
 TRIGGER:-PT10M
@@ -31,9 +34,10 @@ END:VEVENT
 END:VCALENDAR
 ICSFILE
 
-my $date=new YMD();
 
-my $paella=new Paella({data=>$ics,dir=>"ICS",splash=>0});
+
+
+my $paella=new Paella({data=>$ics,dir=>"ICS",splash=>1});
 Draw::clearScreen();
 $paella->run;
 
@@ -113,6 +117,22 @@ sub setupActions{
             $self->{ui}->setKeyAction($mode,$k,$keyActions->{$mode}->{$k});
         }
     }
+}
+
+sub actionNames{
+    my ($self)=@_;
+	 my $actions={
+		 today     => sub{$self->{current}=YMD::today();},
+		 nextday   => sub{$self->{current}=YMD::addDay($self->{current},1);},
+		 prevday   => sub{$self->{current}=YMD::subDay($self->{current},1);},
+		 nextweek  => sub{$self->{current}=YMD::addDay($self->{current},7);},
+		 prevweek  => sub{$self->{current}=YMD::subDay($self->{current},7);},
+		 nextmonth => sub{$self->{current}=YMD::addMonth($self->{current});},
+		 prevmonth => sub{$self->{current}=YMD::subMonth($self->{current});},
+         nextyear  => sub{$self->{current}->{y}++},
+         nextyear  => sub{$self->{current}->{y}--;},
+	 }
+		 
 }
 
 sub run{
@@ -355,11 +375,15 @@ package CalData;
                  my $type=lc $1."s";
                  my $dateStr=substr ($self->{item}->{DTSTART},0,8);
                  if (%{$self->{item}}){
-                    # the items goes onto the list
-                    push @{$self->{calendar}->{$type}},{%{$self->{item}}} if %{$self->{item}}; 
+                    # if the result is a non-empty component that goes onto the list
+                    push @{$self->{calendar}->{$type}},{%{$self->{item}}}; 
+                    if ($self->{item}->{RDATE}){
+						my @dates=split(",",$self->{item}->{RDATE});
+						$self->addDateItem($type,$_) foreach (@dates);
+					}
                     #Then it is added to the indexes based on repetition rules
                     if ($self->{item}->{RRULE}){
-                        $self->parseRRule($type,$dateStr,$self->{item}->{RRULE},$#{$self->{calendar}->{$type}},$self->{col});
+						$self->addDateItem($type,$_) foreach (@{ RRule->new($self->{item}->{RRULE},$self->{item})->{cache}});
                     }
                     else{
                         $self->addDateItem($type,$dateStr);
@@ -369,81 +393,113 @@ package CalData;
             }
             pop @{$self->{levels}};
         }
-        elsif ($self->{levels}->[-1]=~/EVENT|TODO|JOURNAL/){
+        elsif ($self->{levels}->[-1]=~/EVENT|TODO|JOURNAL/){ # main components
             my @parts=($self->{lastLine}=~/^([A-Z\-]+)(\;[^\;\:]+)?(\:.*)$/);
             $self->{item}->{$parts[0]}=substr $parts[-1],1 if $parts[0];
         }
-        elsif ($self->{levels}->[-1]=~/CALENDAR/){
+        elsif ($self->{levels}->[-1]=~/CALENDAR/){          # calendar properties
             my @parts=($self->{lastLine}=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
             $self->{calendar}->{$parts[0]}=substr $parts[-1],1 if $parts[0];
         }
-        else{ #for subcomponents e.g. alarm
+        else{                                              # for other subcomponents e.g. alarm
             $self->{item}->{$self->{levels}->[-1]}//={};
             my @parts=($self->{lastLine}=~/^([A-Z\-]+)(\;[^\;]+)*(\:.*)$/);
             $self->{item}->{$self->{levels}->[-1]}->{$parts[0]}=substr $parts[-1],1 if $parts[0];
         }
     }
     
-    sub parseRRule{
-        my ($self,$type,$dateStr,$rule,$index,$col)=@_;
-        my $rrule={};
-        my $date=YMD->new($dateStr);
-        foreach (split(";",$rule)){
-            my ($key,$value)=split "=";
-            $rrule->{$key}=$value;
-        }
-        $rrule->{INTERVAL}//=1;
-        
-        my ($step,$fun)=(1,"addDay");
-        
-        if ($rrule->{FREQ}){
-            for($rrule->{FREQ}){
-                /DAILY/ && do{
-                    $step=$rrule->{INTERVAL};
-                    last;
-                };
-                /WEEKLY/ && do{
-                    $step=7*$rrule->{INTERVAL};
-                    last;
-                };
-                /MONTHLY/ && do{
-                    $step=$rrule->{INTERVAL};
-                    $fun="addMonth";
-                    last;
-                };
-            }
-			# do the repeats
-			if ($rrule->{COUNT}){
-				my $count=$rrule->{COUNT};
-				while ($count>0){
-						$self->addDateItem($type,$date->toStr());
-						$date=$date->$fun($step);
-						$count--;
-				}
-			}
-			elsif ($rrule->{UNTIL}){
-				while ($date->cmp($rrule->{UNTIL})<=0){
-						$self->addDateItem($type,$date->toStr());
-						$date=$date->$fun($step);
-				}
-				
-			}            
-        }
-
-    }
-    
     sub addDateItem{
         my ($self,$type,$date)=@_;# $date can be a string or YMD object
-        $date = YMD->new($date);
-		my $dateStr=$date->toStr();
-        # item is the last one to be indexed
-        my $item=(@{$self->{calendar}->{$type}})[-1];
-        return if $date->inList($item->{EXDATE});
+		my $dateStr= YMD->new($date)->toStr();
+		# create an index enry for that date unless one exists already
         $self->{dateIndex}->{$dateStr}//={events=>[],todos=>[],journal=>[],};
-        $self->{dateIndex}->{$dateStr}->{$type}=[{index  => $#{$self->{calendar}->{$type}},
-                                           format => $self->{col}->[0]},
-                                           @{$self->{dateIndex}->{$dateStr}->{$type}},];
+        # add to the list for that date
+        push @{$self->{dateIndex}->{$dateStr}->{$type}},{index  => $#{$self->{calendar}->{$type}},
+                                                         format => $self->{col}->[0]},
     }
+
+package RRule;
+###########################################################################
+################### RECURRENCE RULE PARSING OBJECT ########################
+###########################################################################
+sub new{
+	my ($class,$rrule,$item)=@_;
+	my $self={
+		params=>{},
+		complete=>0,
+		cache =>[],
+		rkeys=>"",
+	};
+	if (ref $rrule){ # rrule supplied as object;
+		foreach my $k (keys %$rrule){
+			  if ($k=~/^FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DSTART$/){
+				  $self->{params}->{lc $k}=$rrule->{$k};
+				  $self->{rkeys}.=$k;
+			 };
+		}
+	}
+	else { # rrule supplied as string;
+        foreach (split(";",$rrule)){
+            my ($k,$v)=split "=";
+			if ($k=~/^FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DTSTART$/){
+				  $self->{params}->{lc $k} =$v;
+				  $self->{rkeys}.=$k;
+			 };
+		 }
+	}
+	
+	# use dtstart from item unless dstart provided in rrule;
+	$self->{params}->{dtstart}//=($item && ref $item)?$item->{DTSTART}:$item;  
+	$self->{params}->{interval}//=1;  
+	$self->{exdate}=($item && ref $item && $item->{EXDATE})?$item->{EXDATE}:[];
+	
+	#now split values which are lists
+	for (qw/BYSECOND BYMINUTE BYHOUR BYDAY BYMONTHDAY BYYEARDAY BYWEEKNO BYMONTH BYSETPOS/){
+		my $key=lc $_;
+		if ($self->{params}->{$key}){
+			$self->{params}->{$key}=[split ",",$self->{$key}];
+		}
+	}
+	bless $self,$class;
+	$self->parseRule();
+	return $self;
+}
+
+
+sub parseRule{
+	my $self=shift;
+	my %params=%{$self->{params}};
+	my $tstDate=YMD->new($self->{params}->{dtstart});
+	if ($self->{rkeys}=~/^FREQ(UNTIL|COUNT)(INTERVAL)?$/){
+		while (1){
+			if ($params{freq} eq "DAILY"){
+				$tstDate= $tstDate->addDay($self->{params}->{interval});
+			}
+			elsif ($params{freq} eq "WEEKLY"){
+				$tstDate= $tstDate->addDay(7*$self->{params}->{interval});
+			}
+			elsif ($params{freq} eq "MONTHLY"){
+				$tstDate= $tstDate->addMonth($self->{params}->{interval});
+			}
+			else{
+				warn "Unhandled frequency $params{freq} ";
+				last;
+			}
+			last if $self->toCache($tstDate->toStr());
+		}
+		
+	}
+}
+
+sub toCache{
+	my ($self,$dt)=@_;
+	return 0 if YMD::inList($dt,$self->{exdate}); # exclude the exdates
+	push @{$self->{cache}},$dt;
+	return 0 if ($self->{params}->{until} && YMD->new($dt)->cmp($self->{params}->{until})<=0);
+	return 0 if ($self->{params}->{count} && @{$self->{cache}}<=$self->{params}->{count});
+	return 1; # return 1 if end condition met
+}
+
 
 package YMD;
 ############################################################################################
@@ -466,9 +522,7 @@ package YMD;
 			my $t=$1;
             ($self->{y},$self->{m},$self->{d})=($str=~/^(\d{4})(\d{2})(\d{2})/);
             if ($t){
-				die $t;
 				($self->{H},$self->{M},$self->{S})=($t=~/(\d{2})(\d{2})(\d{2})/);
-				die $self->{H};
 			}
         }
         else {  # if passed with y,m,d 
@@ -554,8 +608,7 @@ package YMD;
         my $self=shift;
         return (qw/January February March April May June July August September October November December/)[$self->{m}-1]
     }
-    
-    
+     
     sub addDay{
         my ($self,$days)=@_;
         my $tmp=new("YMD",$self);
@@ -622,9 +675,10 @@ package YMD;
 	
 	sub inList{
         my ($self,@list)=@_;
-        @list=map{substr($_,0,8)} map{split "," } @list;
+        my $strDate=ref $self?$self->toStr():substr($self,0,8); 
+        @list=map{$_?substr($_,0,8):()} map{$_?split ",":() } @list;
         foreach (@list){
-			return 1 if $self->toStr() eq $_
+			return 1 if $strDate eq $_
 		}
         return 0;
 	}
@@ -908,6 +962,7 @@ sub printGrid{
 
 sub printAt{
   my ($self,$row,$column,@textRows)=@_;
+  # either a array of text lines or arrayref
   @textRows = @{$textRows[0]} if ref $textRows[0];  
   my $blit="\033[?25l";
   $blit.= defined $_?("\033[".$row++.";".$column."H".(ref $_?join("",grep (defined,@$_)):$_)):"" foreach (@textRows) ;
@@ -915,6 +970,12 @@ sub printAt{
   print "\n"; # seems to flush the STDOUT buffer...if not then set $| to 1 
 };
 
+
+sub textBox{
+  my ($self,$position,$dimensions,@textRows)=@_;
+  
+  
+}
 
 sub splash{
     my $self=shift;
