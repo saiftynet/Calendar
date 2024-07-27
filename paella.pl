@@ -9,9 +9,18 @@
 #############################################################################
 
 use strict;use warnings;
-my $VERSION=0.11;
+my $VERSION=0.12;
 
-# this is a test ICS file  fo testing  purposes.
+# this is a test ICS file  for testing  purposes.
+my @examples=(
+    "FREQ=DAILY;COUNT=10;INTERVAL=2",
+	"FREQ=YEARLY;COUNT=2;",
+    "FREQ=MONTHLY; BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1;UNTIL=20241129",
+    "FREQ=YEARLY;INTERVAL=3;BYMONTH=10;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8",
+    "FREQ=MONTHLY; BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1;UNTIL=20141129",
+    "FREQ=WEEKLY;INTERVAL=2",
+);
+my $n=0;
 
 my $ics=<<ICSFILE;
 BEGIN:VCALENDAR
@@ -24,7 +33,7 @@ DTSTART;TZID=America/New_York:20240420T120000
 DURATION:PT1H
 LOCATION:TPRF Conference Room
 RDATE:20240714T123000Z,20240107
-RRULE:FREQ=DAILY;COUNT=10;INTERVAL=2
+RRULE:$examples[$n]
 EXDATE;TZID=America/New_York:20240427T120000,20240428T120000,
 BEGIN:VALARM
 TRIGGER:-PT10M
@@ -481,20 +490,53 @@ sub parseRule{
 			elsif ($params{freq} eq "MONTHLY"){
 				$tstDate= $tstDate->addMonth($self->{params}->{interval});
 			}
+			elsif ($params{freq} eq "YEARLY"){
+				$tstDate= $tstDate->addMonth($self->{params}->{interval}*12);
+			}
 			else{
-				warn "Unhandled frequency $params{freq} ";
+				die "Unhandled frequency $params{freq} ";
 				last;
 			}
-			last if $self->toCache($tstDate->toStr());
+			last if $self->endCondition($tstDate->toStr());
+			$self->intoCache($tstDate);
 		}
-		
+	}
+	elsif($self->{rkeys}=~/^FREQ(UNTIL|COUNT)(INTERVAL)?BYDAY$/){
+		my @collection;my $end=0;my $candidate;
+		if ($params{freq} eq "MONTHLY"){
+			while(1){
+				foreach (@{$self->{params}->{byday}}){
+					push @collection, $tstDate->nDayInMonth($_);
+				} # build a collection
+				@collection=sort(@collection);
+				if ($params{bysetpos} ){
+					my @filtered=();
+					foreach (@{$self->{params}->{bysetpos}}){
+						push @filtered,$collection[$_],
+					}
+					@collection=@filtered;
+				} # filter collection by setpos
+				while(!$end){
+					$candidate=shift @collection;
+					$end=$self->endCondition($candidate);
+					$self->intoCache($candidate) unless $end;
+				}  # put in all the candidates into the cache
+				last if $end;
+				$tstDate->addMonth($self->{params}->{interval});
+				
+			}
+		}
 	}
 }
 
-sub toCache{
+sub intoCache{
+	my ($self,$dt)=@_;
+	push @{$self->{cache}},$dt->toStr() unless $dt->inList($self->{exdate});
+}
+
+sub endCondition{
 	my ($self,$dt)=@_;
 	return 0 if YMD::inList($dt,$self->{exdate}); # exclude the exdates
-	push @{$self->{cache}},$dt;
 	return 0 if ($self->{params}->{until} && YMD->new($dt)->cmp($self->{params}->{until})<=0);
 	return 0 if ($self->{params}->{count} && @{$self->{cache}}<=$self->{params}->{count});
 	return 1; # return 1 if end condition met
@@ -572,7 +614,7 @@ package YMD;
         return int((dayOfYear($self)+6)/7);
     }
 
-# calculate which week of the year a date falls in  0..6 with 0 being Sunday    
+# calculate which day of the week a date falls in  0..6 with 0 being Sunday    
     sub weekday{
         my $self=shift;
         return (dayOfYear($self)+d1greg($self)-1)%7;
@@ -671,6 +713,31 @@ package YMD;
         my $tDay=weekday($tmp);
 		$tmp=$tmp->addDay($day-$tDay+($day<=$tDay?7:0));
 		return $tmp;
+	}
+	
+	sub dayListInMonth{ # list of days in a month with a certain date
+        my ($self,$day)=@_;
+		my $list=[];
+        my $tmp=new("YMD",$self);
+        my $month=$tmp->{m};
+        $tmp=$tmp->subMonth();# get previous month
+        $tmp->{d}=28;         # go near end of month
+        while(1){
+			$tmp=$tmp->next($day);
+			next if $tmp->{m}<$month;
+			last if $tmp->{m}<$month;
+			push @$list,$tmp->toStr()
+		}
+		return $list;        
+	}
+	sub nDayInMonth{
+        my ($self,$nDay)=@_;
+        my($n,$day);
+        if ($nDay=~/^(-?\d+)?(su|mo|tu|we|th|fr|sa)/){
+			($n,$day)=($1,$2);
+		}
+		my $list=$self->dayListInMonth($day);
+		return $n?[$list->[$n]]:$list;   
 	}
 	
 	sub inList{
