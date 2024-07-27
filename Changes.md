@@ -1,3 +1,9 @@
+### Version 0.12
+* incorporated a set of taerget rules to test to be inserted into the test ics data
+* added functions to YMD (a date utility package) to next list of dates  in month by week day
+* added functions to YMD (a date utility package) to next date by weekday, by position (e.g. 2nd wednesday last friday)
+* started a byday/by setpos filtered for monthly recurrences
+
 ### Version 0.11
 * RRule handling pulled out into separate package  Functionality not changed, but now experimenting with RRule parsing without creating very large lists and then filtering as the norm.
 * RRule object now create a cache of dates, which it passes back to CalData object for adding to the date index.
