@@ -9,18 +9,17 @@
 #############################################################################
 
 use strict;use warnings;
-my $VERSION=0.12;
+my $VERSION=0.13;
 
 # this is a test ICS file  for testing  purposes.
 my @examples=(
     "FREQ=DAILY;COUNT=10;INTERVAL=2",
 	"FREQ=YEARLY;COUNT=2;",
-    "FREQ=MONTHLY; BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1;UNTIL=20241129",
+    "FREQ=MONTHLY; BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;UNTIL=20241129",
     "FREQ=YEARLY;INTERVAL=3;BYMONTH=10;BYDAY=TU;BYMONTHDAY=2,3,4,5,6,7,8",
-    "FREQ=MONTHLY; BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1;UNTIL=20141129",
     "FREQ=WEEKLY;INTERVAL=2",
 );
-my $n=0;
+my $n=1;
 
 my $ics=<<ICSFILE;
 BEGIN:VCALENDAR
@@ -441,19 +440,20 @@ sub new{
 	};
 	if (ref $rrule){ # rrule supplied as object;
 		foreach my $k (keys %$rrule){
-			  if ($k=~/^FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DSTART$/){
-				  $self->{params}->{lc $k}=$rrule->{$k};
-				  $self->{rkeys}.=$k;
+			  if ($k=~/(FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DSTART)/i){
+				  $self->{params}->{lc $1}=$rrule->{1};
 			 };
 		}
 	}
 	else { # rrule supplied as string;
         foreach (split(";",$rrule)){
             my ($k,$v)=split "=";
-			if ($k=~/^FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DTSTART$/){
-				  $self->{params}->{lc $k} =$v;
-				  $self->{rkeys}.=$k;
+			if ($k=~/(FREQ|UNTIL|COUNT|INTERVAL|BYSECOND|BYMINUTE|BYHOUR|BYDAY|BYMONTHDAY|BYYEARDAY|BYWEEKNO|BYMONTH|BYSETPOS|WKST|DTSTART)/i){
+				  $self->{params}->{lc $1} =$v;
 			 };
+		 }
+		 foreach (qw/FREQ UNTIL COUNT INTERVAL BYSECOND BYMINUTE BYHOUR BYDAY BYMONTHDAY BYYEARDAY BYWEEKNO BYMONTH BYSETPOS WKST DTSTART/){
+			 $self->{rkeys}.=$_ if (exists $self->{params}->{lc $_})
 		 }
 	}
 	
@@ -466,7 +466,7 @@ sub new{
 	for (qw/BYSECOND BYMINUTE BYHOUR BYDAY BYMONTHDAY BYYEARDAY BYWEEKNO BYMONTH BYSETPOS/){
 		my $key=lc $_;
 		if ($self->{params}->{$key}){
-			$self->{params}->{$key}=[split ",",$self->{$key}];
+			$self->{params}->{$key}=[split ",",$self->{params}->{$key}];
 		}
 	}
 	bless $self,$class;
@@ -479,6 +479,7 @@ sub parseRule{
 	my $self=shift;
 	my %params=%{$self->{params}};
 	my $tstDate=YMD->new($self->{params}->{dtstart});
+	#die $self->{rkeys};
 	if ($self->{rkeys}=~/^FREQ(UNTIL|COUNT)(INTERVAL)?$/){
 		while (1){
 			if ($params{freq} eq "DAILY"){
@@ -497,49 +498,70 @@ sub parseRule{
 				die "Unhandled frequency $params{freq} ";
 				last;
 			}
-			last if $self->endCondition($tstDate->toStr());
+			last if $self->endCondition($tstDate->toStr())=~/^no more/;
 			$self->intoCache($tstDate);
 		}
 	}
-	elsif($self->{rkeys}=~/^FREQ(UNTIL|COUNT)(INTERVAL)?BYDAY$/){
-		my @collection;my $end=0;my $candidate;
+	elsif($self->{rkeys}=~/^FREQ(UNTIL|COUNT)(INTERVAL)?BYDAY(BYSETPOS)?$/){
+		my @collection;my $end=0;my $candidate;my $lastCandidate;
 		if ($params{freq} eq "MONTHLY"){
-			while(1){
+			while($end!~/^no more/){
+				last if $self->endCondition($tstDate)=~/^no more/;  #skip if endo conditions are met
 				foreach (@{$self->{params}->{byday}}){
-					push @collection, $tstDate->nDayInMonth($_);
+					push @collection,@{ $tstDate->nDayInMonth($_)};
 				} # build a collection
-				@collection=sort(@collection);
-				if ($params{bysetpos} ){
+				@collection = sort   @collection; # string sort the collection
+			# 	print "Collection gathered: ",join", ",@collection;print"\n";
+				
+				if (exists $params{bysetpos} ){
 					my @filtered=();
-					foreach (@{$self->{params}->{bysetpos}}){
-						push @filtered,$collection[$_],
+					foreach my $indx (@{$params{bysetpos}}){
+						my $i=$indx=~/^-/?$indx:$indx-1;
+						push @filtered,$collection[$i]
 					}
 					@collection=@filtered;
+					
 				} # filter collection by setpos
-				while(!$end){
+				#$end=$self->endCondition($candidate) if $candidate;
+				while((scalar @collection>0)&& $end!~/^no more/){
 					$candidate=shift @collection;
 					$end=$self->endCondition($candidate);
-					$self->intoCache($candidate) unless $end;
+					#print "Found candidate:",$candidate,"*---  $end\n\n";
+					$self->intoCache($candidate) unless $end=~/^no more/;
 				}  # put in all the candidates into the cache
-				last if $end;
-				$tstDate->addMonth($self->{params}->{interval});
+				
+			#	print "Cycle ",$candidate , $lastCandidate,"\n";
+				last if $end=~/^no more/;
+				$tstDate=$tstDate->addMonth($self->{params}->{interval});
+			#	print "\n\n",$tstDate->toStr(),"\n",$end,"\n",$self->{params}->{until},"\n",
+			#	$tstDate->cmp($self->{params}->{until}),"\n", $self->endCondition($candidate),"\n";
+			#	print "",($self->{params}->{until} && 1),"\n";
+				@collection=();
 				
 			}
+			#die;
 		}
 	}
 }
 
 sub intoCache{
 	my ($self,$dt)=@_;
+	$dt=new YMD ($dt);
 	push @{$self->{cache}},$dt->toStr() unless $dt->inList($self->{exdate});
+	#print @{$self->{cache}};
 }
 
 sub endCondition{
-	my ($self,$dt)=@_;
-	return 0 if YMD::inList($dt,$self->{exdate}); # exclude the exdates
-	return 0 if ($self->{params}->{until} && YMD->new($dt)->cmp($self->{params}->{until})<=0);
-	return 0 if ($self->{params}->{count} && @{$self->{cache}}<=$self->{params}->{count});
-	return 1; # return 1 if end condition met
+	my ($self,$candidate)=@_;
+	my $dt=new YMD ($candidate);
+	if (exists $self->{params}->{until}){
+		print $dt->toStr()," vs ",$self->{params}->{until}," = ",$dt->cmp($self->{params}->{until}),"\n";
+		return ($dt->cmp($self->{params}->{until})<0)?("still more after ". $dt->toStr()):"no more;gone past UNTIL"};
+	print  $dt->toStr(),"not beyond limits\n";
+	if (exists  $self->{params}->{count}){
+		return (scalar @{$self->{cache}}<=$self->{params}->{count})?"still more":"no more;gone past COUNT"
+		} 
+    if (scalar @{$self->{cache}}>100){die};
 }
 
 
@@ -705,7 +727,7 @@ package YMD;
    # get the next date with dayname e.g the next("sunday"), next("TU"), next(2);
     sub next{  
         my ($self,$day)=@_;
-        if ($day=~/^(su|mo|tu|we|th|fr|sa)/i){
+        if ($day=~/^(SU|MO|TU|WE|TH|FR|SA)/i){
 			$day={su=>0,mo=>1,tu=>2,we=>3,th=>4,fr=>5,sa=>6}->{lc $1}
 		}
 		return undef unless($day>=0 && $day<7);
@@ -720,20 +742,21 @@ package YMD;
 		my $list=[];
         my $tmp=new("YMD",$self);
         my $month=$tmp->{m};
-        $tmp=$tmp->subMonth();# get previous month
-        $tmp->{d}=28;         # go near end of month
+        $tmp->{d}=1;   
+        $tmp=$tmp->subDay(1);  
+           
         while(1){
 			$tmp=$tmp->next($day);
 			next if $tmp->{m}<$month;
-			last if $tmp->{m}<$month;
-			push @$list,$tmp->toStr()
+			last if $tmp->{m}>$month;
+			$list=[@$list,$tmp->toStr()],
 		}
-		return $list;        
+		return $list;  
 	}
 	sub nDayInMonth{
         my ($self,$nDay)=@_;
         my($n,$day);
-        if ($nDay=~/^(-?\d+)?(su|mo|tu|we|th|fr|sa)/){
+        if ($nDay=~/^(-?\d+)?(su|mo|tu|we|th|fr|sa)/i){
 			($n,$day)=($1,$2);
 		}
 		my $list=$self->dayListInMonth($day);
@@ -742,6 +765,7 @@ package YMD;
 	
 	sub inList{
         my ($self,@list)=@_;
+        die caller unless $self;
         my $strDate=ref $self?$self->toStr():substr($self,0,8); 
         @list=map{$_?substr($_,0,8):()} map{$_?split ",":() } @list;
         foreach (@list){
