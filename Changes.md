@@ -2,7 +2,7 @@
 * iFixe multple errors
 * fixed list of dates  in month by week day
 * test byday and bysetpos works with freq monthly
-* * still not for infinite recurrences
+* still not for infinite recurrences
 
 ### Version 0.12
 * incorporated a set of taerget rules to test to be inserted into the test ics data
